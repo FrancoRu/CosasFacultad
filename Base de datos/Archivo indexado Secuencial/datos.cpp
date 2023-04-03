@@ -1,38 +1,38 @@
-#include "datos.h"
+﻿#include "datos.h"
 
-datos::datos(int clave, char dato){
-    this->clave = clave;
-    this->dato = dato;
-    this->index = -1;
+Datos::Datos(int clave, char dato){
+    mClave = clave;
+    mDato = dato;
+    mIndex = -1;
 }
 
-datos::datos(){
-    this->index = -1;
-    this->clave = 0;
-    this->dato = '*';
+Datos::Datos(){
+    mClave = 0;
+    mDato = '*';
+    mIndex = -1;
 }
 
-int datos::getClave()
+int Datos::getClave()
 {
-    return this->clave;
+    return mClave;
 }
 
-char datos::getDato()
+char Datos::getDato()
 {
-    return this->dato;
+    return mDato;
 }
 
-int datos::getIndex()
+int Datos::getIndex()
 {
-    return this->index;
+    return mIndex;
 }
 
-void datos::setInfo(int clave, char dato){
-    this->dato = dato;
-    this->clave = clave;
+void Datos::setInfo(int clave, char dato){
+    mDato = dato;
+    mClave = clave;
 }
 
-void datos::setIndex(int index)
+void Datos::setIndex(int index)
 {
-    this->index = index;
+    mIndex = index;
 }

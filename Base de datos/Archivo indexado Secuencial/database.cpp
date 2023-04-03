@@ -1,191 +1,222 @@
-#include "database.h"
+﻿#include "Database.h"
 #include <cstddef>
+#include <iostream>
+#include <iomanip>
+#include <algorithm>
+#include <cmath>
 
-DataBase::DataBase(int _OVER, int _OMAX, int N){
-    this->OVER = _OVER;
-    this->OMAX = _OMAX;
-    this->NBlocks = N;
-    this->PMAX = this->OVER-1;
-    this->CANTBLOCK = this->PMAX/N;
-    this->arreglo = new datos[OMAX];
-    this->mapIndex = new int*[this->CANTBLOCK];
-    for(int i=0; i<this->CANTBLOCK; i++){
-        this->mapIndex[i] = new int[2];
-    }
-    for(int i = 0; i<this->CANTBLOCK; i++){
-        this->mapIndex[i][0] = 0;
-        this->mapIndex[i][1] = i*this->NBlocks;
+Database::Database(int OVER, int OMAX, int N){
+    mOVER = OVER;
+    mOMAX = OMAX;
+    mRegisterPerBlock = N;
+    mPMAX = mOVER - 1;
+    mNumberOfBlocks = mPMAX / N;
+    initializeAreas();
+}
+
+void Database::initializeAreas(){
+    mDataArea = new Datos[mOMAX];
+    mIndexArea = new int*[mNumberOfBlocks];
+
+    for(int i = 0; i < mNumberOfBlocks; i++){
+        mIndexArea[i] = new int[2]{0, i * mRegisterPerBlock};
     }
 }
 
-
-void DataBase::add(datos reg){
-    if(reg.getClave()<=0) return;
-    for(int i=0; i<this->CANTBLOCK; i++){
-        if(isLastBlock(i)){
-            if(isSobrePoblado(getMap(i), reg)){
-                if(i == this->CANTBLOCK-1){
-                    insert(reg, getMap(i));
-                    updateKey(i);
+void Database::addRegister(const Datos& reg) {
+    if (reg.mClave <= 0) {
+        std::cout << "Cannot add register with invalid key\n";
+        return;
+    }
+    for (int block = 0; block < mNumberOfBlocks; block++) {
+        if (isLastBlock(block)) {
+            if (isOverPopulated(getStartingIndex(block), reg)) {
+                if (block == mNumberOfBlocks - 1) {
+                    insertInBlock(reg, getStartingIndex(block));
+                    updateMinimumKey(block);
+                    std::cout << "Register added successfully to block " << block << "\n";
                     break;
                 }
-            }else{
-                insert(reg, getMap(i));
-                updateKey(i);
+            } else {
+                insertInBlock(reg, getStartingIndex(block));
+                updateMinimumKey(block);
+                std::cout << "Register added successfully to block " << block << "\n";
                 break;
             }
-        }else{
-            if(nextMax(i+1, reg.getClave())){
-                insert(reg, getMap(i));
-                updateKey(i);
+        } else {
+            if (isNextValueGreaterThanRegister(block + 1, reg.mClave)) {
+                insertInBlock(reg, getStartingIndex(block));
+                updateMinimumKey(block);
+                std::cout << "Register added successfully to block " << block << "\n";
                 break;
             }
         }
     }
 }
 
-void DataBase::updateKey(int index){
-    this->mapIndex[index][0] = this->arreglo[getMap(index)].getClave();
+void Database::updateMinimumKey(int index){
+    mIndexArea[index][0] = mDataArea[getStartingIndex(index)].mClave;
 }
 
-void DataBase::insert(datos reg, int index){
-    bool band = true;
-    for(int i=index; i<index+this->NBlocks; i++){
-        if(this->arreglo[i].getClave()==0){
-            this->arreglo[i] = reg;
-            sort(index);
-            band = false;
-            break;
+void Database::insertInBlock(const Datos& reg, int blockIndex) {
+    for (int i = blockIndex; i < blockIndex + mRegisterPerBlock; i++) {
+        if (mDataArea[i].mClave == 0) {
+            mDataArea[i] = reg;
+            sortAscending(blockIndex);
+            return;
         }
-        if(this->arreglo[i].getClave()==reg.getClave()) break;
+        if (mDataArea[i].mClave == reg.mClave) {
+            std::cout << "Can't add a register with the same key\n";
+            return;
+        }
     }
-    if(this->arreglo[index+this->NBlocks-1].getClave()!=0&& band) insertOF(reg, index+this->NBlocks);
+
+    insertInOverflow(reg, blockIndex + mRegisterPerBlock);
 }
 
-void DataBase::insertOF(datos reg, int index){
-    if(this->OMAX == this->OVER) return;
-    this->arreglo[OVER-1] = reg;
-    if(this->arreglo[index-1].getIndex()==-1)
-        this->arreglo[index-1].setIndex(OVER-1);
-    this->OVER++;
-    sort(index-this->NBlocks);
+void Database::insertInOverflow(const Datos& reg, int index) {
+    if (mOMAX == mOVER) {
+        std::cout << "Cannot add more registers, there is no more space available. GET MORE RAM!\n";
+        return;
+    }
+
+    mDataArea[mOVER - 1] = reg;
+
+    if (mDataArea[index - 1].mIndex == -1) {
+        mDataArea[index - 1].setIndex(mOVER - 1);
+    }
+
+    mOVER++;
+
+    sortAscending(index - mRegisterPerBlock);
 }
 
-bool DataBase::isLastBlock(int index){
-    if(index<this->CANTBLOCK-1){
-        return this->mapIndex[index+1][0] == 0;
+bool Database::isLastBlock(int index) {
+    if (index < mNumberOfBlocks - 1) {
+        return mIndexArea[index + 1][0] == 0;
     }
+
     return true;
 }
 
-bool DataBase::isSobrePoblado(int index, datos reg){
-    int cont = 0;
-    int min = this->arreglo[index].getClave();
-    for(int i=index; i<index+this->NBlocks; i++){
-        if(this->arreglo[i].getClave()!=0) cont++;
+bool Database::isOverPopulated(int index, const Datos& reg) {
+    int cont = std::count_if(&mDataArea[index], &mDataArea[index + mRegisterPerBlock],
+            [](const Datos& data) { return data.mClave != 0; });
+
+    int min = mDataArea[index].mClave;
+    int max = mDataArea[index + cont - 1].mClave;
+
+    if (reg.mClave > min && reg.mClave < max) {
+        return false;
     }
-    if(reg.getClave()>min&&reg.getClave()<this->arreglo[index+cont-1].getClave()) return false;
-    return cont >= this->NBlocks/2;
+
+    return cont >= ceil(mRegisterPerBlock / 2);
 }
 
-datos DataBase::find(int key){
-    int ind = block(key);
-    datos temp;
-    if(ind == -1) return temp;
-    for(int i= ind; i<ind+this->NBlocks;i++){
-        if(this->arreglo[i].getClave()==key) temp = this->arreglo[i];
+Datos Database::findRegister(int keyToFind) {
+    int indexOfBlock = getBlock(keyToFind);
+    Datos temp;
+
+    if (indexOfBlock == -1) {
+        return temp;
     }
-    if(temp.getClave()==0){
-        for(int i=this->arreglo[ind+this->NBlocks-1].getIndex(); i<this->OMAX; i++){
-            if(this->arreglo[i].getClave()==key) temp = this->arreglo[i];
+
+    auto begin = mDataArea + indexOfBlock;
+    auto end = mDataArea + indexOfBlock + mRegisterPerBlock;
+
+    auto it = std::find_if(begin, end, [keyToFind](const Datos& data) {
+        return data.mClave == keyToFind;
+    });
+
+    if (it != end) {
+        return *it;
+    }
+
+    for (int i = mDataArea[indexOfBlock + mRegisterPerBlock - 1].mIndex; i < mOMAX; i++) {
+        if (mDataArea[i].mClave == keyToFind) {
+            return mDataArea[i];
         }
     }
+
     return temp;
 }
 
-int DataBase::block(int key){
+int Database::getBlock(int keyToFind) {
     int bloque = -1;
-    for(int i=0; i<this->CANTBLOCK; i++){
-        if(i == this->CANTBLOCK-1){
-            if(key>= this->mapIndex[i][0]) bloque = this->mapIndex[i][1];
-        }else if(key>= this->mapIndex[i][0]&&key<= this->mapIndex[i+1][0]) bloque= this->mapIndex[i][1];
+    for (int i = 0; i < mNumberOfBlocks; i++) {
+        if (i == mNumberOfBlocks - 1 && keyToFind >= mIndexArea[i][0]) {
+            bloque = mIndexArea[i][1];
+        } else if (keyToFind >= mIndexArea[i][0] && keyToFind <= mIndexArea[i + 1][0]) {
+            bloque = mIndexArea[i][1];
+        }
     }
     return bloque;
 }
 
-bool DataBase::nextMax(int index, int valor){
-    return this->mapIndex[index][0] > valor;
+bool Database::isNextValueGreaterThanRegister(int index, int value){
+    return mIndexArea[index][0] > value;
 }
 
-datos DataBase::element(int index){
-    return this->arreglo[index];
+Datos Database::getElementAt(int index){
+    return mDataArea[index];
 }
 
-int DataBase::getMap(int index){
-    return this->mapIndex[index][1];
+int Database::getStartingIndex(int index){
+    return mIndexArea[index][1];
 }
-/*
-void DataBase::sort(int index){
-    datos temp;
-    for(int i=index; i<index+this->NBlocks-1; i++){
-        for(int j= i+1; j<index+this->NBlocks; j++){
-            if(this->arreglo[j].getClave()!=0 && this->arreglo[j+1].getClave()!=0){
-                if(this->arreglo[i].getClave()>this->arreglo[j].getClave()){
-                    temp = this->arreglo[i];
-                    this->arreglo[i] = this->arreglo[j];
-                    this->arreglo[j] = temp;
-                }
-            }else{
-                i+=this->OMAX;
-                break;
-            }
 
-        }
-    }
-}
-*/
-void DataBase::sort(int index) {
-    for (int i = index; i < index + this->NBlocks - 1; i++) {
-        bool swapped = false;
-        for (int j = index; j < index + this->NBlocks - i - 1; j++) {
-            if (this->arreglo[j].getClave() != 0 && this->arreglo[j + 1].getClave() != 0 &&
-                this->arreglo[j].getClave() > this->arreglo[j + 1].getClave()) {
-                std::swap(this->arreglo[j], this->arreglo[j + 1]);
-                swapped = true;
+void Database::sortAscending(int index) {
+    bool sorted = false;
+    while (!sorted) {
+        sorted = true;
+        for (int i = index; i < (index + mRegisterPerBlock - 1); i++) {
+            if (mDataArea[i].mClave != 0 && mDataArea[i+1].mClave  != 0 &&
+                    mDataArea[i].mClave > mDataArea[i + 1].mClave) {
+                std::swap(mDataArea[i], mDataArea[i + 1]);
+                sorted = false;
             }
         }
-        if (!swapped) {
-            break;
-        }
-    }
-    // Mover elementos con valor 0 al final del arreglo
-    int i = index;
-    int j = index + this->NBlocks - 1;
-    while (i < j) {
-        if (this->arreglo[i].getClave() == 0) {
-            std::swap(this->arreglo[i], this->arreglo[j]);
-            j--;
-        } else {
-            i++;
-        }
-    }
-}
-void DataBase::carga(){
-    for(int i=0 ; i<this->CANTBLOCK; i++){
-        this->mapIndex[i][1] = i*this->NBlocks;
     }
 }
 
 
-void DataBase::show(){
-    std::cout<<"Primary data:"<<std::endl;
-    for(int i = 0; i<this->PMAX; i++){
-        if(i%this->NBlocks == 0) std::cout<<"------------------"<<std::endl;
-        std::cout<<this->arreglo[i].getClave()<<"  Direccionamiento OF "<<this->arreglo[i].getIndex()<<std::endl;
+void Database::showAreas() {
+    std::cout << "-----------------------------------------" << std::endl;
+    std::cout << "|      Area de indices                  |" << std::endl;
+    std::cout << "|   Clave Minima ---- Direccion         |" << std::endl;
+    std::cout << "-----------------------------------------" << std::endl;
+
+    for (int i = 0; i < mNumberOfBlocks; i++) {
+        std::cout << "| " << std::setw(14) << std::left << mIndexArea[i][0] << " | " << std::setw(20) << std::left << mIndexArea[i][1] << " |" << std::endl;
     }
-    std::cout<<"------------------"<<std::endl;
-    std::cout<<"Overflow:"<<std::endl;
-    for(int i = this->PMAX; i<this->OMAX; i++){
-        std::cout<<this->arreglo[i].getClave()<<std::endl;
+    std::cout << "-----------------------------------------" << std::endl;
+
+    std::cout << std::endl;
+    std::cout << "-----------------------------------------" << std::endl;
+    std::cout << "|     Area primaria de Datos            |" << std::endl;
+    std::cout << "-----------------------------------------" << std::endl;
+    std::cout << "|   Clave  |     Valor      | Direccion |" << std::endl;
+    std::cout << "-----------------------------------------" << std::endl;
+
+    for (int i = 0; i < mPMAX; i++) {
+        if (i % mRegisterPerBlock == 0){
+            std::cout << "-----------------------------------------" << std::endl;
+        }
+        std::cout << "| " << std::setw(8) << std::left << mDataArea[i].mClave << " | " << std::setw(14) << std::left << mDataArea[i].mDato << " | " << std::setw(10) << std::left << mDataArea[i].mIndex << "|" << std::endl;
     }
+    std::cout << "-----------------------------------------" << std::endl;
+
+    std::cout << std::endl;
+    std::cout << "-----------------------------------------" << std::endl;
+    std::cout << "|           Overflow                    |" << std::endl;
+    std::cout << "-----------------------------------------" << std::endl;
+    std::cout << "|   Clave  |     Valor      |           |" << std::endl;
+    std::cout << "-----------------------------------------" << std::endl;
+
+    for (int i = mPMAX; i < mOMAX; i++) {
+        std::cout << "| " << std::setw(8) << std::left << mDataArea[i].mClave << " | " << std::setw(14) << std::left << mDataArea[i].mDato << " |           |" << std::endl;
+    }
+    std::cout << "-----------------------------------------" << std::endl;
 }
+
+

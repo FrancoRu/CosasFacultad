@@ -1,21 +1,22 @@
-#ifndef DATOS_H
+﻿#ifndef DATOS_H
 #define DATOS_H
 
-
-class datos
+class Datos
 {
+    friend class Database;
+
 private:
-    int clave;
-    char dato;
-    int index;
+    int mClave;
+    char mDato;
+    int mIndex;
 public:
-    datos(int, char);
-    datos();
+    Datos(int clave, char dato);
+    Datos();
     int getClave();
     char getDato();
     int getIndex();
-    void setInfo(int, char);
-    void setIndex(int);
+    void setInfo(int clave, char dato);
+    void setIndex(int index);
 };
 
 #endif // DATOS_H

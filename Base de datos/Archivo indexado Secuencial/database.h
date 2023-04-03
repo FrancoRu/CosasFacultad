@@ -1,33 +1,35 @@
-#ifndef DATABASE_H
-#define DATABASE_H
-#include "datos.h"
+﻿#ifndef Database_H
+#define Database_H
+#include "Datos.h"
 #include <iostream>
-class DataBase
+
+class Database
 {
 private:
-    datos* arreglo;
-    int** mapIndex;
-    int OMAX;
-    int OVER;
-    int NBlocks;
-    int PMAX;
-    int CANTBLOCK;
-    void updateKey(int);
-    void insert(datos, int);
-    void insertOF(datos, int);
+    Datos* mDataArea;
+    int** mIndexArea;
+    int mOMAX;
+    int mOVER;
+    int mPMAX;
+    int mRegisterPerBlock;
+    int mNumberOfBlocks;
+    void updateMinimumKey(int);
+    void insertInBlock(const Datos&, int);
+    void insertInOverflow(const Datos& , int);
+    bool isOverPopulated(int, const Datos&);
     bool isLastBlock(int);
-    bool isSobrePoblado(int, datos);
-    int block(int);
-    bool nextMax(int, int);
-    datos element(int);
-    int getMap(int);
-    void sort(int);
-    void carga();
+    bool isNextValueGreaterThanRegister(int, int);
+    int getBlock(int);
+    Datos getElementAt(int);
+    int getStartingIndex(int);
+    void sortAscending(int);
+    void initializeAreas();
+
 public:
-    DataBase(int, int, int);
-    void add(datos);
-    datos find(int);
-    void show();
+    Database(int, int, int);
+    void addRegister(const Datos&);
+    Datos findRegister(int);
+    void showAreas();
 };
 
-#endif // DATABASE_H
+#endif // Database_H
