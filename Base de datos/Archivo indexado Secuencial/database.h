@@ -19,7 +19,9 @@ public:
     void insert(datos, int);
     void insertOF(datos, int);
     bool isLastBlock(int);
-    bool isSobrePoblado(int);
+    bool isSobrePoblado(int, datos);
+    datos find(int);
+    int block(int);
     bool nextMax(int, int);
     datos element(int);
     int getMap(int);

@@ -9,7 +9,7 @@ datos::datos(int clave, char dato){
 datos::datos(){
     this->index = -1;
     this->clave = 0;
-    this->dato = '0';
+    this->dato = '*';
 }
 
 int datos::getClave()
