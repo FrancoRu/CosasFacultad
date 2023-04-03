@@ -12,21 +12,21 @@ private:
     int NBlocks;
     int PMAX;
     int CANTBLOCK;
-public:
-    DataBase(int, int, int);
-    void add(datos);
     void updateKey(int);
     void insert(datos, int);
     void insertOF(datos, int);
     bool isLastBlock(int);
     bool isSobrePoblado(int, datos);
-    datos find(int);
     int block(int);
     bool nextMax(int, int);
     datos element(int);
     int getMap(int);
     void sort(int);
     void carga();
+public:
+    DataBase(int, int, int);
+    void add(datos);
+    datos find(int);
     void show();
 };
 
