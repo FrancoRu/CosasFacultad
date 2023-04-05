@@ -1,17 +1,17 @@
-﻿#ifndef DATOS_H
-#define DATOS_H
+#ifndef REGISTERDATA_H
+#define REGISTERDATA_H
 
-class Datos
+class registerData
 {
-    friend class Database;
+    friend class indexedSequentialFile;
 
 private:
     int mClave;
     char mDato;
     int mIndex;
 public:
-    Datos(int clave, char dato);
-    Datos();
+    registerData(int clave, char dato);
+    registerData();
     int getClave();
     char getDato();
     int getIndex();
@@ -19,4 +19,4 @@ public:
     void setIndex(int index);
 };
 
-#endif // DATOS_H
+#endif // REGISTERDATA_H

@@ -1,6 +1,6 @@
-﻿#include <iostream>
+#include <iostream>
 #include <limits>
-#include "Database.h"
+#include "indexedSequentialFile.h"
 using namespace std;
 
 int main()
@@ -13,20 +13,20 @@ int main()
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         cout << "Invalid input. Please enter a positive non-zero integer for OVER: ";
     }
-    cout << "OMAX (total length of the area of data): ";
+    cout << "OMAX (total length of data area): ";
     while (!(cin >> omax) || omax <= 0) {
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         cout << "Invalid input. Please enter a positive non-zero integer for OMAX: ";
     }
-    cout << "N (number of values per block): ";
+    cout << "N (number of registers per block): ";
     while (!(cin >> n) || n <= 0) {
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         cout << "Invalid input. Please enter a positive non-zero integer for N: ";
     }
 
-    Database base(over + 1, omax, n);
+    indexedSequentialFile base(over + 1, omax, n);
     char choice;
     do {
         cout << endl << "Choose an option:" << endl;
@@ -53,9 +53,8 @@ int main()
                     cin.ignore(numeric_limits<streamsize>::max(), '\n');
                     cout << "Invalid input. Please enter a character for the value: ";
                 }
-                Datos newRegistro(key, value);
+                registerData newRegistro(key, value);
                 base.addRegister(newRegistro);
-                cout << "New register added successfully!" << endl;
                 break;
             }
             case '2': {
@@ -66,12 +65,12 @@ int main()
                     cin.ignore(numeric_limits<streamsize>::max(), '\n');
                     cout << "Invalid input. Please enter a positive non-zero integer for the key: ";
                 }
-                Datos registroEncontrado = base.findRegister(key);
+                registerData registroEncontrado = base.findRegister(key);
                 if (registroEncontrado.getDato() != '*') {
-                    cout << "Registro encontrado: " << registroEncontrado.getDato() << endl;
+                    cout << "Register found: " << registroEncontrado.getDato() << endl;
                 }
                 else {
-                    cout << "No se ha encontrado el registro con la llave especificada" << endl;
+                    cout << "Register with specified key was not found." << endl;
                 }
                 break;
             }
@@ -80,6 +79,7 @@ int main()
                 break;
             }
             case '4':
+                cout << "Thank you for using the program :´) " << endl;
                 break;
             default:
                 cout << "Invalid choice. Please choose an option from the menu." << endl;

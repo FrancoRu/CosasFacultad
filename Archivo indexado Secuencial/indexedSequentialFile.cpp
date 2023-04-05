@@ -1,11 +1,11 @@
-﻿#include "Database.h"
+#include "indexedSequentialFile.h"
 #include <cstddef>
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
 #include <cmath>
 
-Database::Database(int OVER, int OMAX, int N){
+indexedSequentialFile::indexedSequentialFile(int OVER, int OMAX, int N){
     mOVER = OVER;
     mOMAX = OMAX;
     mRegisterPerBlock = N;
@@ -14,8 +14,8 @@ Database::Database(int OVER, int OMAX, int N){
     initializeAreas();
 }
 
-void Database::initializeAreas(){
-    mDataArea = new Datos[mOMAX];
+void indexedSequentialFile::initializeAreas(){
+    mDataArea = new registerData[mOMAX];
     mIndexArea = new int*[mNumberOfBlocks];
 
     for(int i = 0; i < mNumberOfBlocks; i++){
@@ -23,59 +23,74 @@ void Database::initializeAreas(){
     }
 }
 
-void Database::addRegister(const Datos& reg) {
+bool indexedSequentialFile::isBetween(const registerData & reg, int index){
+    int min = mDataArea[index].mClave;
+    int i = 0;
+    while(mDataArea[i].mClave != 0 && i < mRegisterPerBlock){
+        i++;
+    }
+    return (reg.mClave > min && reg.mClave < mDataArea[index + i - 1].mClave);
+}
+
+void indexedSequentialFile::addRegister(const registerData& reg) {
     if (reg.mClave <= 0) {
         std::cout << "Cannot add register with invalid key\n";
         return;
     }
     for (int block = 0; block < mNumberOfBlocks; block++) {
-        if (isLastBlock(block)) {
+        if (isLastBlock(block) || isBetween(reg, getStartingIndex(block))) {
             if (isOverPopulated(getStartingIndex(block), reg)) {
                 if (block == mNumberOfBlocks - 1) {
                     insertInBlock(reg, getStartingIndex(block));
                     updateMinimumKey(block);
-                    std::cout << "Register added successfully to block " << block << "\n";
                     break;
                 }
             } else {
                 insertInBlock(reg, getStartingIndex(block));
                 updateMinimumKey(block);
-                std::cout << "Register added successfully to block " << block << "\n";
                 break;
             }
         } else {
             if (isNextValueGreaterThanRegister(block + 1, reg.mClave)) {
                 insertInBlock(reg, getStartingIndex(block));
                 updateMinimumKey(block);
-                std::cout << "Register added successfully to block " << block << "\n";
                 break;
             }
         }
     }
 }
 
-void Database::updateMinimumKey(int index){
+void indexedSequentialFile::updateMinimumKey(int index){
     mIndexArea[index][0] = mDataArea[getStartingIndex(index)].mClave;
+    sortAscendingIndex();
 }
 
-void Database::insertInBlock(const Datos& reg, int blockIndex) {
+void indexedSequentialFile::insertInBlock(const registerData& reg, int blockIndex) {
     for (int i = blockIndex; i < blockIndex + mRegisterPerBlock; i++) {
         if (mDataArea[i].mClave == 0) {
             mDataArea[i] = reg;
             sortAscending(blockIndex);
+
+            if(i + mRegisterPerBlock == mOVER){
+                std::cout <<"Register added in block " << blockIndex / mRegisterPerBlock + 1 << ", because is not possible to create another block." << std::endl;
+            }else{
+                std::cout << "Register added successfully to block " << blockIndex / mRegisterPerBlock + 1 << "\n";
+            }
+
             return;
         }
         if (mDataArea[i].mClave == reg.mClave) {
+
             std::cout << "Can't add a register with the same key\n";
+
             return;
         }
     }
-
     insertInOverflow(reg, blockIndex + mRegisterPerBlock);
 }
 
-void Database::insertInOverflow(const Datos& reg, int index) {
-    if (mOMAX == mOVER) {
+void indexedSequentialFile::insertInOverflow(const registerData& reg, int index) {
+    if (mOMAX + 1 == mOVER) {
         std::cout << "Cannot add more registers, there is no more space available. GET MORE RAM!\n";
         return;
     }
@@ -86,12 +101,14 @@ void Database::insertInOverflow(const Datos& reg, int index) {
         mDataArea[index - 1].setIndex(mOVER - 1);
     }
 
+    std::cout << "Register added in OVERFLOW area, because block " << index / mRegisterPerBlock << " was full." << std::endl;
+
     mOVER++;
 
     sortAscending(index - mRegisterPerBlock);
 }
 
-bool Database::isLastBlock(int index) {
+bool indexedSequentialFile::isLastBlock(int index) {
     if (index < mNumberOfBlocks - 1) {
         return mIndexArea[index + 1][0] == 0;
     }
@@ -99,9 +116,9 @@ bool Database::isLastBlock(int index) {
     return true;
 }
 
-bool Database::isOverPopulated(int index, const Datos& reg) {
+bool indexedSequentialFile::isOverPopulated(int index, const registerData& reg) {
     int cont = std::count_if(&mDataArea[index], &mDataArea[index + mRegisterPerBlock],
-            [](const Datos& data) { return data.mClave != 0; });
+            [](const registerData& data) { return data.mClave != 0; });
 
     int min = mDataArea[index].mClave;
     int max = mDataArea[index + cont - 1].mClave;
@@ -113,9 +130,9 @@ bool Database::isOverPopulated(int index, const Datos& reg) {
     return cont >= ceil(mRegisterPerBlock / 2);
 }
 
-Datos Database::findRegister(int keyToFind) {
+registerData indexedSequentialFile::findRegister(int keyToFind) {
     int indexOfBlock = getBlock(keyToFind);
-    Datos temp;
+    registerData temp;
 
     if (indexOfBlock == -1) {
         return temp;
@@ -124,7 +141,7 @@ Datos Database::findRegister(int keyToFind) {
     auto begin = mDataArea + indexOfBlock;
     auto end = mDataArea + indexOfBlock + mRegisterPerBlock;
 
-    auto it = std::find_if(begin, end, [keyToFind](const Datos& data) {
+    auto it = std::find_if(begin, end, [keyToFind](const registerData& data) {
         return data.mClave == keyToFind;
     });
 
@@ -141,7 +158,7 @@ Datos Database::findRegister(int keyToFind) {
     return temp;
 }
 
-int Database::getBlock(int keyToFind) {
+int indexedSequentialFile::getBlock(int keyToFind) {
     int bloque = -1;
     for (int i = 0; i < mNumberOfBlocks; i++) {
         if (i == mNumberOfBlocks - 1 && keyToFind >= mIndexArea[i][0]) {
@@ -153,19 +170,19 @@ int Database::getBlock(int keyToFind) {
     return bloque;
 }
 
-bool Database::isNextValueGreaterThanRegister(int index, int value){
+bool indexedSequentialFile::isNextValueGreaterThanRegister(int index, int value){
     return mIndexArea[index][0] > value;
 }
 
-Datos Database::getElementAt(int index){
+registerData indexedSequentialFile::getElementAt(int index){
     return mDataArea[index];
 }
 
-int Database::getStartingIndex(int index){
+int indexedSequentialFile::getStartingIndex(int index){
     return mIndexArea[index][1];
 }
 
-void Database::sortAscending(int index) {
+void indexedSequentialFile::sortAscending(int index) {
     bool sorted = false;
     while (!sorted) {
         sorted = true;
@@ -179,8 +196,23 @@ void Database::sortAscending(int index) {
     }
 }
 
+void indexedSequentialFile::sortAscendingIndex(){
+    bool sorted = false;
+    while (!sorted) {
+        sorted = true;
+        for (int i = 0; i < mNumberOfBlocks - 1; i++) {
+            if (mIndexArea[i][0] != 0 && mIndexArea[i+1][0]  != 0 &&
+                    mIndexArea[i][0] > mIndexArea[i+1][0]) {
+                std::swap(mIndexArea[i][0], mIndexArea[i+1][0]);
+                std::swap(mIndexArea[i][1], mIndexArea[i+1][1]);
+                sorted = false;
+            }
+        }
+    }
+}
 
-void Database::showAreas() {
+
+void indexedSequentialFile::showAreas() {
     std::cout << "-----------------------------------------" << std::endl;
     std::cout << "|      Area de indices                  |" << std::endl;
     std::cout << "|   Clave Minima ---- Direccion         |" << std::endl;
