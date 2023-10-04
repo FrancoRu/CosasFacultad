@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <limits>
 #include "indexedSequentialFile.h"
 using namespace std;
@@ -6,19 +6,18 @@ using namespace std;
 int main()
 {
     int over, omax, n;
-    cout << "Enter the initial parameters for the database" << endl;
-    cout << "---------------------------------------------" << endl;
+    cout << "Enter the initial parameters for the database:" << endl;
     cout << "OVER (value where the overflow area starts): ";
     while (!(cin >> over) || over <= 0) {
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         cout << "Invalid input. Please enter a positive non-zero integer for OVER: ";
     }
-    cout << "OMAX (total length of data area, has to be greater than OVER value): ";
-    while (!(cin >> omax) || omax <= 0 || omax <= over) {
+    cout << "OMAX (total length of data area): ";
+    while (!(cin >> omax) || omax <= 0) {
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        cout << "Invalid input. Please enter a positive non-zero integer greater than OVER value for OMAX: ";
+        cout << "Invalid input. Please enter a positive non-zero integer for OMAX: ";
     }
     cout << "N (number of registers per block): ";
     while (!(cin >> n) || n <= 0) {
@@ -28,10 +27,6 @@ int main()
     }
 
     indexedSequentialFile base(over + 1, omax, n);
-
-    cout << "\n" << endl;
-    base.showAreas();
-
     char choice;
     do {
         cout << endl << "Choose an option:" << endl;
@@ -84,7 +79,7 @@ int main()
                 break;
             }
             case '4':
-                cout << "Thank you for using the program :] " << endl;
+                cout << "Thank you for using the program :´) " << endl;
                 break;
             default:
                 cout << "Invalid choice. Please choose an option from the menu." << endl;
