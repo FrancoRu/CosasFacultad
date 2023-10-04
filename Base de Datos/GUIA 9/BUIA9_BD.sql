@@ -163,16 +163,78 @@ JOIN (
 
 --13. Cantidad de itinerarios que visitan cada zona.
 
+SELECT id_itinerario, COUNT(id_zona) AS Zonas 
+FROM ITINERARIO_ZONA
+GROUP BY(id_itinerario)
 
 --14. Indicar por cada itinerario la relación longitud sobre duración, ordenados de mayor
 --a menor siendo los mayores los más exigentes.
+
+SELECT  codigo, duracion, longitud, cant_visitantes
+FROM ITINERARIO
+ORDER BY(longitud/duracion) DESC
+
 --15. Indicar los itinerarios cuya duración este por encima del promedio.
+
+SELECT codigo, duracion, longitud, cant_visitantes
+FROM ITINERARIO
+WHERE duracion > (SELECT AVG(duracion) FROM ITINERARIO);
+
 --16. Listado de itinerarios que pueden visitar determinada especie.
+
+SELECT I.codigo , I.duracion , I.longitud , I.cant_visitantes
+FROM ITINERARIO I JOIN ITINERARIO_ZONA IZ
+ON IZ.id_itinerario = I.codigo
+JOIN ZONA Z
+ON Z.codigo = IZ.id_zona
+JOIN ESPECIE E
+ON E.id_zona = Z.codigo
+WHERE E.nombre = 'Tigre'
+
 --17. Listado de empleados que no tengan especies a cargo ni lleven ningún itinerario.
+
+SELECT legajo, nombre, direccion, telefono, fecha_ingreso
+FROM EMPLEADO
+WHERE legajo 
+NOT IN 
+(SELECT C.id_legajo FROM CUIDADOR C 
+JOIN CUIDADOR_ESPECIE CE 
+ON CE.id_legajo = C.id_legajo 
+JOIN ESPECIE E 
+ON CE.id_especie = E.codigo)
+AND legajo 
+NOT IN 
+(SELECT G.id_legajo FROM GUIA G 
+JOIN GUIA_ITINERARIO GI 
+ON GI.id_legajo = G.id_legajo 
+JOIN ITINERARIO I 
+ON I.codigo = GI.id_itinerario);
+
 --18. Listado de cuidadores y la cantidad de especies a cargo tiene cada uno.
+
+SELECT E.legajo, E.nombre, E.direccion, E.telefono, E.fecha_ingreso, COUNT(CE.id_especie) AS CANTIDAD
+FROM EMPLEADO E
+JOIN CUIDADOR C ON C.id_legajo = E.legajo
+JOIN CUIDADOR_ESPECIE CE ON CE.id_legajo = C.id_legajo
+GROUP BY E.legajo, E.nombre, E.direccion, E.telefono, E.fecha_ingreso;
+
 --19. Cuidadores con más de 5 especies a cargo.
+
+SELECT E.legajo, E.nombre, E.direccion, E.telefono, E.fecha_ingreso, COUNT(CE.id_especie) AS CANTIDAD
+FROM EMPLEADO E
+JOIN CUIDADOR C ON C.id_legajo = E.legajo
+JOIN CUIDADOR_ESPECIE CE ON CE.id_legajo = C.id_legajo
+GROUP BY E.legajo, E.nombre, E.direccion, E.telefono, E.fecha_ingreso
+HAVING COUNT(CE.id_especie) > 0;
+
 --20. Nombre de la especie con mayor número de cuidadores
 
+SELECT TOP 1 nombre,	nombre_cientifico, descripcion , COUNT(CE.id_legajo) AS 'CUIDADORES'
+FROM ESPECIE E
+JOIN CUIDADOR_ESPECIE CE
+ON E.codigo = CE.id_especie
+GROUP BY E.nombre, E.nombre_cientifico, E.descripcion
+ORDER BY (COUNT(CE.id_legajo)) DESC 
 
 --CARGA DE DATOS
 
@@ -212,12 +274,18 @@ VALUES (201, 'Zona A', 5000);
 INSERT INTO ZONA (codigo, nombre, extension)
 VALUES (202, 'Zona B', 7000);
 
+INSERT INTO ZONA (codigo, nombre, extension)
+VALUES (203, 'Zona C', 7700);
+
 -- Itinerarios
 INSERT INTO ITINERARIO (codigo, duracion, longitud, cant_visitantes)
 VALUES (301, 120, 2000, 50);
 
 INSERT INTO ITINERARIO (codigo, duracion, longitud, cant_visitantes)
 VALUES (302, 90, 1500, 40);
+
+INSERT INTO ITINERARIO (codigo, duracion, longitud, cant_visitantes)
+VALUES (303, 60, 1500, 40);
 
 -- Guías
 INSERT INTO GUIA (id_legajo)
@@ -237,6 +305,10 @@ VALUES (4), (5);
 INSERT INTO CUIDADOR_ESPECIE (id_legajo, id_especie, fecha_desde)
 VALUES (3, 101, '2023-10-01');
 
+
+INSERT INTO CUIDADOR_ESPECIE (id_legajo, id_especie, fecha_desde)
+VALUES (3, 102, '2023-10-01');
+
 INSERT INTO CUIDADOR_ESPECIE (id_legajo, id_especie, fecha_desde)
 VALUES (4, 102, '2023-09-15');
 
@@ -246,6 +318,9 @@ VALUES (301, 201);
 
 INSERT INTO ITINERARIO_ZONA (id_itinerario, id_zona)
 VALUES (302, 202);
+
+INSERT INTO ITINERARIO_ZONA (id_itinerario, id_zona)
+VALUES (302, 203);
 
 -- GUIA_ITINERARIO
 INSERT INTO GUIA_ITINERARIO (id_legajo, id_itinerario, hora)
