@@ -830,8 +830,11 @@ GROUP BY p.pais_nombre
 ORDER BY cantidad_jugadores DESC
 
 --11
+SELECT P.partido_id FROM Partido P
 
-SELECT P.partido_id, E.equipo_nombre FROM Partido P
+
+
+SELECT COUNT(EP.estadistica_partido_valor) FROM Partido P
 JOIN Equipo_Jugador EJ
 ON EJ.equipo_id = P.partido_local_equipo_id OR
 EJ.equipo_id = P.partido_visitante_equipo_id
@@ -839,16 +842,23 @@ JOIN Equipo E
 ON E.equipo_id = EJ.equipo_id
 JOIN Jugador J
 ON J.jugador_id = EJ.jugador_id
-WHERE (J.jugador_nombre = 'Kawhi' AND J.jugador_apellido = 'Leonard')
-
-
-WHERE (J.jugador_nombre = 'Kawhi' AND J.jugador_apellido = 'Leonard') AND
-(ES.estadistica_descripcion = "Rebotes ofensivos" OR 
-ES.estadistica_descripcion = "Rebotes defensivos" OR 
-ES.estadistica_descripcion = "Asistencia" OR 
-ES.estadistica_descripcion = "Puntos")
-
-SELECT * FROM Estadistica
+JOIN Division D
+ON D.division_id = E.equipo_division_id
+JOIN Equipo ER
+ON ER.equipo_id = P.partido_local_equipo_id OR
+ER.equipo_id = P.partido_visitante_equipo_id 
+JOIN Division DR
+ON DR.division_id = ER.equipo_division_id
+JOIN EstadisticaPartido EP
+ON EP.estadistica_partido_partido_id = P.partido_id AND EP.estadistica_partido_jugador_id = J.jugador_id
+JOIN Estadistica ES
+ON ES.estadistica_id = EP.estadistica_partido_estadistica_id
+WHERE (J.jugador_nombre = 'Kawhi' AND J.jugador_apellido = 'Leonard') AND 
+(D.division_conferencia_id <> DR.division_conferencia_id) AND
+(ES.estadistica_descripcion = 'Rebotes ofensivos' OR 
+ES.estadistica_descripcion = 'Rebotes defensivos' OR 
+ES.estadistica_descripcion = 'Asistencia' OR 
+ES.estadistica_descripcion = 'Puntos')
 
 --12
 
