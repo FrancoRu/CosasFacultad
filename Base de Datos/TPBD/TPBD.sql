@@ -831,24 +831,33 @@ ORDER BY cantidad_jugadores DESC
 
 --11
 
-SELECT P.partido_id, E.equipo_nombre FROM Partido P
-JOIN Equipo_Jugador EJ
-ON EJ.equipo_id = P.partido_local_equipo_id OR
-EJ.equipo_id = P.partido_visitante_equipo_id
-JOIN Equipo E
-ON E.equipo_id = EJ.equipo_id
-JOIN Jugador J
-ON J.jugador_id = EJ.jugador_id
-WHERE (J.jugador_nombre = 'Kawhi' AND J.jugador_apellido = 'Leonard')
-
-
-WHERE (J.jugador_nombre = 'Kawhi' AND J.jugador_apellido = 'Leonard') AND
-(ES.estadistica_descripcion = "Rebotes ofensivos" OR 
-ES.estadistica_descripcion = "Rebotes defensivos" OR 
-ES.estadistica_descripcion = "Asistencia" OR 
-ES.estadistica_descripcion = "Puntos")
-
-SELECT * FROM Estadistica
+SELECT
+SUM(CASE WHEN e.estadistica_descripcion = 'Puntos' THEN ep.estadistica_partido_valor ELSE 0 END) AS total_puntos,
+SUM(CASE WHEN e.estadistica_descripcion IN ('Rebotes ofensivos', 'Rebotes defensivos') THEN ep.estadistica_partido_valor ELSE 0 END) AS total_rebotes,
+SUM(CASE WHEN e.estadistica_descripcion = 'Asistencias' THEN ep.estadistica_partido_valor ELSE 0 END) AS total_asistencias
+FROM
+Jugador j
+JOIN
+EstadisticaPartido ep ON j.jugador_id = ep.estadistica_partido_jugador_id
+JOIN
+Estadistica e ON ep.estadistica_partido_estadistica_id = e.estadistica_id
+JOIN
+Partido p ON ep.estadistica_partido_partido_id = p.partido_id
+JOIN
+Equipo local ON p.partido_local_equipo_id = local.equipo_id
+JOIN
+Equipo visitante ON p.partido_visitante_equipo_id = visitante.equipo_id
+JOIN
+Division local_division ON local.equipo_division_id = local_division.division_id
+JOIN
+Division visitante_division ON visitante.equipo_division_id = visitante_division.division_id
+WHERE
+(j.jugador_nombre = 'Kawhi' AND j.jugador_apellido = 'Leonard') 
+AND (
+(local_division.division_conferencia_id <> visitante_division.division_conferencia_id)
+OR
+(visitante_division.division_conferencia_id <> local_division.division_conferencia_id) 
+);
 
 --12
 
