@@ -357,6 +357,10 @@ WHERE
     equipoOP_ciudad = 'LA';
 
 UPDATE datos_staging
+SET stat_rebotes_defensivos_nombre = 'Rebotes defensivos'
+WHERE stat_rebotes_defensivos_id = 3
+
+UPDATE datos_staging
 SET 
     equipo_idCiudad = 22,
     equipo_ciudad = 'Los Angeles'
@@ -514,9 +518,6 @@ SELECT DISTINCT stat_tiros_triples_convertidos_id, stat_tiros_triples_convertido
 UNION
 SELECT DISTINCT stat_perdidas_id, stat_perdidas_nombre FROM datos_staging;
 
-UPDATE Estadistica
-SET estadistica_descripcion = 'Rebotes defensivos' 
-WHERE estadistica_id = 3
 
 INSERT INTO Equipo(equipo_id, equipo_sigla, equipo_nombre, equipo_codigo, equipo_ciudad_id, equipo_division_id)
 SELECT DISTINCT
