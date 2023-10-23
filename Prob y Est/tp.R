@@ -275,3 +275,72 @@ barplot(distribucion_absoluta)
 #ejer 6
 
 puntuaciones <- c(23,60,79,32,57,74,52,70,82,36,80,77,81,95,41,65,92,85,55,76,52,10,64,75,78,25,80,98,81,67,41,71,83,54,64,72,88,62,74,43,60,78,89,76,84,48,84,90,15,79,34,67,17,82,69,74,63,80,85,61)
+
+# Crear un histograma con frecuencia absoluta
+hist_abs <- hist(puntuaciones)
+
+# Calcular la frecuencia relativa
+freq_rel <- hist_abs$counts / sum(hist_abs$counts)
+
+# Crear un nuevo histograma con frecuencia relativa
+hist_rel <- hist_abs
+hist_rel$counts <- freq_rel
+
+#media
+media <- mean(puntuaciones)
+media
+
+#mediana
+mediana <- median(puntuaciones)
+mediana
+
+#desviacion estandar
+des_est = sd(puntuaciones)
+des_est
+
+#primer cuartil
+primer_cuartil <- quantile(puntuaciones, 0.25)
+primer_cuartil
+
+#percentil 85
+percentil <- quantile(puntuaciones, 0.85)
+percentil
+
+#Significa que el 85% de tus datos está por debajo de 84
+#En el caso de primer_cuartil, significa que el 25% de 
+#los datos está por debajo de 54.75,
+
+# Crear un boxplot
+boxplot(puntuaciones, main="Boxplot de Datos", ylab="Valores")
+
+#Ejer 7
+fumadores <- c(69.3, 56.0, 22.1,47.6,53.2,48.1,52.7,34.4,60.2,43.8,23.2,13.8)
+no_fumadores <- c(28.6,25.1,26.4,34.9,29.8,28.4,38.5,30.2,30.6,31.8,41.6,21.1,36.0,37.9,13.9)
+
+#media
+media_fumadores <-mean(fumadores)
+media_no_fumadores <-mean(no_fumadores)
+
+#mediana
+mediana_fumadores <-median(fumadores)
+mediana_no_fumadores <-median(no_fumadores)
+
+#desviacion estandar
+des_est_fumadores <- sd(fumadores)
+des_est_no_fumadores <- sd(no_fumadores)
+
+#boxplot a definir
+
+#muestras
+fumadores
+no_fumadores
+media_fumadores
+media_no_fumadores
+mediana_fumadores
+mediana_no_fumadores
+des_est_fumadores
+des_est_no_fumadores
+
+#ejer 8
+
+#preguntar a hernan
