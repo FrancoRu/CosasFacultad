@@ -749,7 +749,7 @@ WHERE MONTH(P.partido_fecha) = 12
 
 --5
 
-SELECT COUNT(DISTINCT partido_id) FROM Partido P
+SELECT COUNT(DISTINCT partido_id) AS CANT_PART_PERDIDOS FROM Partido P 
 INNER JOIN Equipo E
 ON E.equipo_id = P.partido_local_equipo_id OR E.equipo_id = P.partido_visitante_equipo_id 
 WHERE E.equipo_nombre = 'Bucks' AND P.partido_ganador_equipo_id <> E.equipo_id
@@ -893,15 +893,3 @@ JOIN Jugador J
 ON EJ.jugador_id = J.jugador_id
 WHERE J.jugador_nombre = 'Kawhi' AND J.jugador_apellido = 'Leonard'
 ORDER BY (ABS(P.partido_puntos_visitante - P.partido_puntos_local )) DESC
-
---COMPROBACION DE EQUIPO DE JUGADOR
-SELECT E.equipo_sigla, E.equipo_id
-FROM Equipo E
-JOIN Equipo_Jugador EJ ON EJ.equipo_id = E.equipo_id
-JOIN Jugador J ON J.jugador_id = EJ.jugador_id
-WHERE J.jugador_nombre = 'Kawhi' AND J.jugador_apellido = 'Leonard';
-
---COMPROBACION DE RESULTADOS
-SELECT *, ABS(partido_puntos_visitante - partido_puntos_local) AS 'DIFERENCIA' FROM Partido WHERE partido_ganador_equipo_id = 1610612746
-ORDER BY (ABS(partido_puntos_visitante - partido_puntos_local)) DESC
-
