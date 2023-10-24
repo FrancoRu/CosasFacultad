@@ -408,7 +408,7 @@ WHERE idPais = 0;
 UPDATE ds
 SET ds.idPais = MaxIdPais.MaxIdPais + RowNumber
 FROM datos_staging ds
-JOIN (
+INNER JOIN (
     SELECT pais, ROW_NUMBER() OVER (ORDER BY pais) AS RowNumber
     FROM (
         SELECT DISTINCT pais
@@ -416,7 +416,7 @@ JOIN (
         WHERE idPais = 0
     ) AS TempPais
 ) AS TempPaisWithRowNumber ON ds.pais = TempPaisWithRowNumber.pais
-CROSS JOIN (
+CROSS INNER JOIN (
     SELECT ISNULL(MAX(idPais), 0) AS MaxIdPais
     FROM datos_staging
     WHERE idPais > 0
@@ -741,9 +741,9 @@ P.partido_puntos_local AS 'PUNTOS LOCAL',
 EV.equipo_nombre AS 'EQUIPO VISITANTE',
 P.partido_puntos_visitante AS 'PUNTOS VISITANTE'
 FROM Partido P
-JOIN Equipo EL
+INNER JOIN Equipo EL
 ON EL.equipo_id = p.partido_local_equipo_id
-JOIN Equipo EV
+INNER JOIN Equipo EV
 ON EV.equipo_id = p.partido_visitante_equipo_id
 WHERE MONTH(P.partido_fecha) = 12
 
@@ -770,16 +770,11 @@ ORDER BY AVG(CAST(EP.estadistica_partido_valor AS DECIMAL(5,2))) DESC;
 --7
 
 SELECT TOP 5 E.equipo_nombre, 
-       AVG(PuntosPorPartido) AS PromedioPuntosPorPartido
+       SUM(PL.partido_puntos_local + PV.partido_puntos_visitante)
+       / (COUNT(PL.partido_local_equipo_id) + COUNT(PV.partido_visitante_equipo_id)) AS PromedioPuntosPorPartido
 FROM Equipo E
-INNER JOIN (
-    SELECT partido_local_equipo_id AS equipo_id, partido_puntos_local AS PuntosPorPartido
-    FROM Partido
-    UNION ALL
-    SELECT partido_visitante_equipo_id AS equipo_id, partido_puntos_visitante AS PuntosPorPartido
-    FROM Partido
-) AS Puntos	
-ON E.equipo_id = Puntos.equipo_id
+LEFT JOIN Partido AS PL ON E.equipo_id = PL.partido_local_equipo_id
+LEFT JOIN Partido AS PV ON E.equipo_id = PV.partido_visitante_equipo_id
 GROUP BY E.equipo_nombre
 ORDER BY PromedioPuntosPorPartido DESC;
 
@@ -819,7 +814,7 @@ GROUP BY D.division_nombre
 
 SELECT TOP(1) p.pais_nombre, COUNT(j.jugador_id) AS cantidad_jugadores
 FROM Jugador j
-JOIN Pais p ON j.jugador_pais_id = p.pais_id
+INNER JOIN Pais p ON j.jugador_pais_id = p.pais_id
 GROUP BY p.pais_nombre
 ORDER BY cantidad_jugadores DESC
 
@@ -832,14 +827,14 @@ SELECT
     SUM(CASE WHEN ES.estadistica_descripcion = 'Asistencias' THEN EP.estadistica_partido_valor ELSE 0 END) AS Asistencias,
     SUM(CASE WHEN ES.estadistica_descripcion = 'Puntos' THEN EP.estadistica_partido_valor ELSE 0 END) AS Puntos
 FROM Partido P
-JOIN Equipo_Jugador EJ ON EJ.equipo_id = P.partido_local_equipo_id OR EJ.equipo_id = P.partido_visitante_equipo_id
-JOIN Equipo E ON E.equipo_id = EJ.equipo_id
-JOIN Jugador J ON J.jugador_id = EJ.jugador_id
-JOIN Division D ON D.division_id = E.equipo_division_id
-JOIN Equipo ER ON ER.equipo_id = P.partido_local_equipo_id OR ER.equipo_id = P.partido_visitante_equipo_id
-JOIN Division DR ON DR.division_id = ER.equipo_division_id
-JOIN EstadisticaPartido EP ON EP.estadistica_partido_partido_id = P.partido_id AND EP.estadistica_partido_jugador_id = J.jugador_id
-JOIN Estadistica ES ON ES.estadistica_id = EP.estadistica_partido_estadistica_id
+INNER JOIN Equipo_Jugador EJ ON EJ.equipo_id = P.partido_local_equipo_id OR EJ.equipo_id = P.partido_visitante_equipo_id
+INNER JOIN Equipo E ON E.equipo_id = EJ.equipo_id
+INNER JOIN Jugador J ON J.jugador_id = EJ.jugador_id
+INNER JOIN Division D ON D.division_id = E.equipo_division_id
+INNER JOIN Equipo ER ON ER.equipo_id = P.partido_local_equipo_id OR ER.equipo_id = P.partido_visitante_equipo_id
+INNER JOIN Division DR ON DR.division_id = ER.equipo_division_id
+INNER JOIN EstadisticaPartido EP ON EP.estadistica_partido_partido_id = P.partido_id AND EP.estadistica_partido_jugador_id = J.jugador_id
+INNER JOIN Estadistica ES ON ES.estadistica_id = EP.estadistica_partido_estadistica_id
 WHERE (J.jugador_nombre = 'Kawhi' AND J.jugador_apellido = 'Leonard') 
     AND (D.division_conferencia_id <> DR.division_conferencia_id)
     AND (ES.estadistica_descripcion IN ('Rebotes ofensivos', 'Rebotes defensivos', 'Asistencias', 'Puntos'))
@@ -864,9 +859,9 @@ ORDER BY J.jugador_apellido, J.jugador_nombre;
 --14
 
 SELECT COUNT(estadistica_partido_partido_id) AS 'CANTIDAD' FROM EstadisticaPartido EP 
-JOIN Equipo_Jugador EJ
+INNER JOIN Equipo_Jugador EJ
 ON EJ.jugador_id = EP.estadistica_partido_jugador_id
-JOIN Equipo E
+INNER JOIN Equipo E
 ON E.equipo_id = EJ.equipo_id
 WHERE E.equipo_nombre = 'Celtics' 
 AND EP.estadistica_partido_estadistica_id = 11 
@@ -883,13 +878,13 @@ SELECT TOP 1
        P.partido_puntos_visitante AS 'PUNTOS VISITANTE',
 	   ABS(P.partido_puntos_local - P.partido_puntos_visitante) AS 'DIFERENCIA'
 FROM Partido P
-JOIN Equipo PL
+INNER JOIN Equipo PL
 ON PL.equipo_id = P.partido_local_equipo_id
-JOIN Equipo PV
+INNER JOIN Equipo PV
 ON PV.equipo_id = P.partido_visitante_equipo_id
-JOIN Equipo_Jugador EJ
+INNER JOIN Equipo_Jugador EJ
 ON PL.equipo_id = EJ.equipo_id OR PV.equipo_id = EJ.equipo_id
-JOIN Jugador J 
+INNER JOIN Jugador J 
 ON EJ.jugador_id = J.jugador_id
 WHERE J.jugador_nombre = 'Kawhi' AND J.jugador_apellido = 'Leonard'
 ORDER BY (ABS(P.partido_puntos_visitante - P.partido_puntos_local )) DESC
