@@ -749,7 +749,7 @@ WHERE MONTH(P.partido_fecha) = 12
 
 --5
 
-SELECT DISTINCT partido_id FROM Partido P
+SELECT COUNT(DISTINCT partido_id) FROM Partido P
 INNER JOIN Equipo E
 ON E.equipo_id = P.partido_local_equipo_id OR E.equipo_id = P.partido_visitante_equipo_id 
 WHERE E.equipo_nombre = 'Bucks' AND P.partido_ganador_equipo_id <> E.equipo_id

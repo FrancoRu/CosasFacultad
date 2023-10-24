@@ -1,4 +1,6 @@
+CREATE DATABASE CLUB_NAU_GUIA10
 USE CLUB_NAU_GUIA10
+DROP DATABASE CLUB_NAU_GUIA10
 
 CREATE TABLE SOCIO(
  DNI INT NOT NULL PRIMARY KEY,
@@ -29,19 +31,19 @@ CREATE TABLE AMARRE(
  id_socio INT NOT NULL,
  id_zona CHAR NOT NULL,
  fecha_desde DATE NOT NULL,
- medidor_de_agua DECIMAL(3,2) NOT NULL,
- medidor_de_luz DECIMAL(3,2) NOT NULL,
+ medidor_de_agua DECIMAL(5,2) NOT NULL,
+ medidor_de_luz DECIMAL(5,2) NOT NULL,
  mantenimiento BIT NOT NULL,
  CONSTRAINT FK_SOCIO FOREIGN KEY(id_socio) REFERENCES SOCIO(DNI),
  CONSTRAINT FK_ZONA FOREIGN KEY(id_zona) REFERENCES ZONA(letra)
 );
 
 ALTER TABLE AMARRE
-ALTER COLUMN medidor_de_agua DECIMAL(5,2) NOT NULL;
-
+ALTER COLUMN id_socio INT
 
 ALTER TABLE AMARRE
-ALTER COLUMN medidor_de_luz DECIMAL(5,2) NOT NULL;
+ALTER COLUMN fecha_desde DATE
+
 
 CREATE TABLE EMBARCACION(
  matricula INT NOT NULL PRIMARY KEY,
@@ -50,14 +52,12 @@ CREATE TABLE EMBARCACION(
  id_amarre INT NOT NULL,
  fecha_desde DATE NOT NULL,
  nombre VARCHAR(100) NOT NULL,
- dimension DECIMAL(3,2) NOT NULL,
+ dimension DECIMAL(5,2) NOT NULL,
  CONSTRAINT FK_TIPO FOREIGN KEY(id_tipo) REFERENCES TIPO_EMBARCACION(codigo),
  CONSTRAINT FK_SOCIO_EMB FOREIGN KEY(id_socio) REFERENCES SOCIO(DNI),
- CONSTRAINT FK_AMARRE FOREIGN KEY(id_socio) REFERENCES AMARRE(numero)
+ CONSTRAINT FK_EMB_AMARRE FOREIGN KEY(id_amarre) REFERENCES AMARRE(numero)
 );
 
-ALTER TABLE EMBARCACION
-ALTER COLUMN dimension DECIMAL(5,2) NOT NULL;
 
 CREATE TABLE EMPLEADO_ZONA(
  id_empleado INT NOT NULL,
@@ -89,23 +89,41 @@ SELECT matricula, id_tipo, id_socio, id_amarre, fecha_desde, nombre, dimension F
 
 -- 4. Listado de nombre de socio, dni, y cantidad de embarcaciones que posee.
 
+SELECT S.nombre AS 'NOMBRE',
+       S.DNI AS 'DOCUMENTO',
+       COUNT(E.matricula) AS 'CANTIDAD DE EMBARCACIONES'
+FROM SOCIO S
+JOIN EMBARCACION E ON E.id_socio = S.DNI
+GROUP BY S.nombre, S.DNI
+ORDER BY COUNT(E.matricula) DESC
 
 
 -- 5. Identificar a qué zona pertenece un amarre dado.
 
-
+SELECT Z.letra AS 'CODIGO DE ZONA', A.numero AS 'CODIGO DE AMARRE' FROM ZONA Z
+JOIN AMARRE A
+ON A.id_zona = Z.letra
+WHERE A.numero = 3
 
 -- 6. Listado de amarres disponibles, indicando la zona a la que pertenece.
 
-
+SELECT A.numero AS 'AMARRE', Z.letra AS 'ZONA', Z.profundidad AS 'PROFUNDIDAD' FROM AMARRE A
+JOIN ZONA Z
+ON A.id_zona = Z.letra
+WHERE A.id_socio IS NULL
 
 -- 7. Indicar el nombre y teléfono del propietario de una embarcación conocida su matrícula.
 
-
+SELECT S.nombre AS 'NOMBRE',
+S.dirección AS 'DIRECCION' FROM SOCIO S
+JOIN EMBARCACION E
+ON E.id_socio = S.DNI
+WHERE E.matricula = 1001
 
 -- 8. Seleccionar los 10 socios con mayor antigüedad.
 
-
+SELECT TOP 10 S.nombre, S.DNI, S.dirección, S.fecha_desde FROM SOCIO S
+ORDER BY (S.fecha_desde) ASC
 
 -- 9. Listado de amarres ocupados por embarcaciones de terceros.
 
@@ -200,7 +218,11 @@ VALUES
     (2, 22222222, 'B', '2021-06-15', 12.0, 18.5, 0),
     (3, 33333333, 'C', '2023-04-20', 9.0, 13.5, 1);
 
-	SELECT * FROM AMARRE
+INSERT INTO AMARRE (numero, id_zona, medidor_de_agua, medidor_de_luz, mantenimiento)
+VALUES
+    (4, 'A', 10.5, 15.0, 1),
+    (5, 'B', 12.0, 18.5, 0),
+    (6, 'C',  9.0, 13.5, 1);
 
 -- Insertar datos en la tabla EMBARCACION
 INSERT INTO EMBARCACION (matricula, id_tipo, id_socio, id_amarre, fecha_desde, nombre, dimension)
@@ -208,6 +230,12 @@ VALUES
     (1001, 101, 11111111, 1, '2022-02-01', 'Velero A', 10.0),
     (1002, 102, 22222222, 2, '2021-06-15', 'Yate B', 15.5),
     (1003, 103, 33333333, 3, '2023-04-20', 'Lancha C', 8.2);
+
+INSERT INTO EMBARCACION (matricula, id_tipo, id_socio, id_amarre, fecha_desde, nombre, dimension)
+VALUES
+    (1004, 101, 11111111, 1, '2022-02-01', 'Velero A', 10.0),
+    (1005, 102, 11111111, 2, '2021-06-15', 'Yate B', 15.5),
+    (1006, 103, 33333333, 3, '2023-04-20', 'Lancha C', 8.2);
 
 -- Insertar datos en la tabla EMPLEADO_ZONA
 INSERT INTO EMPLEADO_ZONA (id_empleado, id_zona)
