@@ -1,7 +1,5 @@
 DROP DATABASE IF EXISTS TPBD;
 
-CREATE DATABASE TPBD;
-
 DELETE FROM Ciudad;
 DELETE FROM Conferencia;
 DELETE FROM Division;
@@ -13,6 +11,8 @@ DELETE FROM EstadisticaPartido;
 DELETE FROM Pais;
 DELETE FROM Partido;
 DELETE FROM Temporada;
+
+CREATE DATABASE TPBD;
 
 USE TPBD;
 
@@ -107,7 +107,6 @@ equipo_idCiudad int,
 equipoOP_idCiudad int
 )
 
-
 CREATE TABLE datos_staging (
     equipoOP_ciudad VARCHAR(MAX),
     equipoOP_codigo VARCHAR(MAX),
@@ -200,7 +199,7 @@ CREATE TABLE datos_staging (
 );
 
 BULK INSERT datos_staging
-FROM 'C:\Users\franc\OneDrive\Escritorio\TP BD GIT BAVA\TPBD\datos2023.csv'
+FROM 'C:\Users\wasak\Desktop\tpbd\Base de Datos\TPBD\datos2023.csv'
 WITH (
     FIRSTROW = 2,
     FIELDTERMINATOR = ',', 
@@ -284,7 +283,6 @@ CREATE TABLE EstadisticaPartido (
     )
 );
 
-
 CREATE TABLE Equipo_Jugador (
     equipo_jugador_id INT PRIMARY KEY,
     jugador_id INT REFERENCES Jugador(jugador_id),
@@ -293,8 +291,6 @@ CREATE TABLE Equipo_Jugador (
     numero_camiseta INT,
     CONSTRAINT UQ_EquipoJugador UNIQUE (jugador_id, equipo_id, temporada_id)
 );
-
-
 
 UPDATE datos_staging
 SET 
@@ -440,6 +436,7 @@ WHERE CAMISETA IS NOT NULL;
 ALTER TABLE datos_staging
 ADD division_id INT,
     conference_id INT;
+GO
 
 UPDATE datos_staging
 SET division_id = 
@@ -517,7 +514,6 @@ UNION
 SELECT DISTINCT stat_tiros_triples_convertidos_id, stat_tiros_triples_convertidos_nombre FROM datos_staging
 UNION
 SELECT DISTINCT stat_perdidas_id, stat_perdidas_nombre FROM datos_staging;
-
 
 INSERT INTO Equipo(equipo_id, equipo_sigla, equipo_nombre, equipo_codigo, equipo_ciudad_id, equipo_division_id)
 SELECT DISTINCT
@@ -713,9 +709,6 @@ INSERT INTO EstadisticaPartido
 	stat_perdidas_id,
 	stat_perdidas_valor
 	FROM datos_staging;
-
---Borrar Tabla de datos
-DROP TABLE datos_staging;
 
 --ACTIVIDADES 
 
