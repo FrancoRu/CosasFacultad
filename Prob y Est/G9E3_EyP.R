@@ -90,7 +90,7 @@ t.test(n_autos, alternative = "less", mu=3000)
 #EJER 6
 #X vac / X:"Es el peso del diamante producido sinteticamente en kilates"
 
-m_diamante <-c(0.46,0.61,0.52,0.48,0.54)
+m_diamante <-c(0.46,0.61,0.52,0.48,0.54, 0.57)
 n= 6 #n es chico por que es menor a 6
 alpha = 0.10
 #muestra poblacional desconocida
@@ -113,8 +113,61 @@ Tcalc_diamante <- (media_diamante-0.5)/(des_est_diamante/sqrt(n))
 t.test(m_diamante, alternative = "greater", mu=0.5)
 
 #verificamos p-value < alpha
-#Como 0.2238 > 0.1 no rechazamos la hipotesis nula
+#Como 0.1227 > 0.1 no rechazamos la hipotesis nula
 #No hay evidencia muestral suficiente para demostrar que el peso del diamante producido
 #sinteticamente sea mayor a 0.5 kilates
 
 #por lo tanto el proceso no funciogsna de manera rentable
+
+#EJER 7
+
+#X vac/ X: "Contenido de un cierto solvente en un envase en litros"
+#Datos)
+
+n_envases <- 10 # n es chico porque es menor a 30
+muestra_envases <- c(10.2,9.7,10.1,10.3,10.1,9.8,9.9,10.4,10.3,9.8)
+alpha = 0.01
+media_envases = mean(muestra_envases)
+des_est_envases <- sd(muestra_envases)
+#X distribucion normal
+#la varianza poblacional es desconocida
+
+#Planteo)
+#H0) mu0 = 10
+#H1) mu0 <> 10
+
+#Estadistico de pruebas
+Tcalc_envases <- (media_envases - 10)/(des_est_envases/sqrt(n_envases))
+
+#Calculamos t.test
+t.test(muestra_envases, alternative="two.sided", mu=10)
+
+#Desicion verificamos si p-value < alpha
+#Como 0.46 > 0.01 Rechazamos la Hipotesis nula
+
+#Conclucion: No hay evidencia muestral suficiente para afirmar que el contenido de cierto 
+#solvente en un envase sea distinto a 10 litros
+
+#Por lo tanto el error que podemos caer es del TIPO II 
+
+#EJER 8
+
+#X1 vac/X:"Tiempo de duracion de una pelicula en el sitio web B en minutos"
+#X2 vac/X:"Tiempo de duracion de una pelicula en el sitio web A en minutos"
+
+#Datos)
+pel_sit_a <- c(103,94,110,87,98)
+pel_sit_b <- c(97,82,123,92,175,88,118)
+
+
+#Planteo)
+#Se usa diferencia de media
+#H0 -> mu1 - mu2 = 10 
+#H1 -> mu1 - mu2 < 10
+#Verificamos si llas varianzas poblacionales son iguales o no
+#Debemos fijarnos que el 1 este dentro del intervalo
+#si se encuentra en el intervalo las variables poblacionales son iguales
+var.test(pel_sit_b, pel_sit_a,conf.level = 0.90)$conf.int
+
+
+t.test(pel_sit_b, pel_sit_a,var.equal = FALSE,alternative="less", mu=10)
