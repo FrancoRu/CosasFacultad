@@ -1,7 +1,7 @@
 <?php
 
 require_once 'DBConnect.php';
-class DBServices
+class DBService
 {
   private static $instance;
   private $stmt;

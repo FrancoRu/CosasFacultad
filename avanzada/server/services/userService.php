@@ -1,5 +1,5 @@
  <?php
-  require_once '.\\dbRepository\\DBService.php';
+  require_once 'dbRepository/DBService.php';
 
   class UserService
   {
