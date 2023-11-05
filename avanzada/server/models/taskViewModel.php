@@ -6,7 +6,7 @@ class TaskViewModel
   public $task_name;
   public $task_desc;
   public $task_priority;
-  private $error; // Mantener privado para no enviar a la base de datos.
+  private $error;
 
   public function __construct($args = [])
   {
@@ -46,7 +46,7 @@ class TaskViewModel
   public function validateProjectId()
   {
     if (!is_string($this->project_id) || !preg_match('/^[0-9a-fA-F]{32}$/', $this->project_id)) {
-      $this->error = $this->createError('Invalid project_id format');
+      $this->error = $this->createError('Formato de project_id inválido');
       return false;
     }
 
@@ -56,7 +56,7 @@ class TaskViewModel
   public function validateTaskId()
   {
     if (!is_string($this->task_id) || !preg_match('/^[0-9a-fA-F]{32}$/', $this->task_id)) {
-      $this->error = $this->createError('Invalid task_id format');
+      $this->error = $this->createError('Formato de task_id inválido');
       return false;
     }
 
@@ -66,7 +66,7 @@ class TaskViewModel
   public function validateTaskName()
   {
     if (!is_string($this->task_name)) {
-      $this->error = $this->createError('Task_name should be a string');
+      $this->error = $this->createError('El nombre de la tarea debe ser una cadena de texto.');
       return false;
     }
 

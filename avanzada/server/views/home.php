@@ -1,6 +1,9 @@
-<?php $userController = UserController::getInstance(); ?>
-
-<?php require_once 'views/layout/header.php'; ?>
+<?php
+$userController = UserController::getInstance();
+$pageTitle = "Página Principal";
+$pageDescription = "Bienvenido a la página principal de mi sitio web.";
+require_once 'views/layout/header.php';
+?>
 
 <div class="main-content">
   <div class="home-container">

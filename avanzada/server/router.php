@@ -3,11 +3,8 @@ define('DIR', __DIR__);
 
 $requestUri = $_SERVER['REQUEST_URI'];
 $requestMethod = $_SERVER['REQUEST_METHOD'];
-
-// Include the routes definitions
 $routes = include 'routes.php';
 
-// Parse the request and execute the corresponding controller method
 if (array_key_exists($requestUri, $routes)) {
   if (array_key_exists($requestMethod, $routes[$requestUri])) {
     list($controllerName, $methodName) = explode('@', $routes[$requestUri][$requestMethod]);
@@ -15,19 +12,17 @@ if (array_key_exists($requestUri, $routes)) {
 
     if (file_exists($controllerFile)) {
       require $controllerFile;
-      $controller = new $controllerName();
+      $controller = $controllerName::getInstance();
       $controller->$methodName();
     } else {
       http_response_code(404);
-      echo 'Controller not found';
+      echo 'Controllador no encontrado';
     }
   } else {
     http_response_code(405);
-    echo 'Method not allowed for this route';
+    echo 'Método no encontrado para esta ruta';
   }
 } else {
   http_response_code(404);
-  echo 'Route not found';
+  echo 'Ruta no encontrada';
 }
-
-//que es esto tarantula

@@ -25,7 +25,7 @@ class ProjectController
     $projectData = new ProjectViewModel($_POST);
 
     if (!$projectData->isValid()) {
-      return $this->errorResponse("Data not valid");
+      return $this->errorResponse("Datos no válidos");
     }
 
     $result = $this->projectService->createProject(get_object_vars($projectData));
@@ -37,7 +37,7 @@ class ProjectController
     $projectData = new ProjectViewModel($_POST);
 
     if (!$projectData->isValid()) {
-      return $this->errorResponse("Data not valid");
+      return $this->errorResponse("Datos no válidos");
     }
 
     $result = $this->projectService->modifyProject(get_object_vars($projectData));
@@ -53,7 +53,7 @@ class ProjectController
       return $this->successResponse($result);
     }
 
-    return $this->errorResponse("Invalid or missing 'project_id' in request");
+    return $this->errorResponse("Falta 'project_id 'en la request o el dato es inválido");
   }
 
   public function getProject()
@@ -65,7 +65,7 @@ class ProjectController
       return $this->successResponse($result);
     }
 
-    return $this->errorResponse("Invalid or missing 'project_id' in request");
+    return $this->errorResponse("Falta 'project_id' en la request o el dato es inválido");
   }
 
   public function getAllProjects()
@@ -77,7 +77,7 @@ class ProjectController
       return $this->successResponse($result);
     }
 
-    return $this->errorResponse("Invalid or missing 'project_userId' in request");
+    return $this->errorResponse("Falta 'project_userId' en la request o el dato es inválido");
   }
 
   private function successResponse($data)

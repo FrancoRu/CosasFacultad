@@ -25,7 +25,7 @@ class TaskController
     $taskData = new TaskViewModel($_POST);
 
     if (!$taskData->isValid()) {
-      return $this->errorResponse("Data not valid");
+      return $this->errorResponse("Datos no validos");
     }
 
     $result = $this->taskService->createTask(get_object_vars($taskData));
@@ -37,7 +37,7 @@ class TaskController
     $taskData = new TaskViewModel($_POST);
 
     if (!$taskData->isValid()) {
-      return $this->errorResponse("Data not valid");
+      return $this->errorResponse("Datos no validos");
     }
 
     $result = $this->taskService->modifyTask(get_object_vars($taskData));
@@ -53,7 +53,7 @@ class TaskController
       return $this->successResponse($result);
     }
 
-    return $this->errorResponse("Missing 'task_id' in request");
+    return $this->errorResponse("Falta 'task_id' en la request o el dato es invalido");
   }
 
   public function getTask()
@@ -65,7 +65,7 @@ class TaskController
       return $this->successResponse($result);
     }
 
-    return $this->errorResponse("Missing 'task_id' in request");
+    return $this->errorResponse("Falta 'task_id' en la request o el dato es invalido");
   }
 
   public function getAllTasks()
@@ -77,7 +77,7 @@ class TaskController
       return $this->successResponse($result);
     }
 
-    return $this->errorResponse("Missing 'project_id' in request");
+    return $this->errorResponse("Falta 'project_id' en la request o el dato es invalido");
   }
 
   private function successResponse($data)

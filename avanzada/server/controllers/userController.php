@@ -44,7 +44,7 @@ class UserController
         $_SESSION['username'] = $userViewModel->username;
         $this->isLoggedIn();
       } else {
-        $this->redirectTo('login', 'Username or password incorrect!');
+        $this->redirectTo('login', 'Usuario or contraseña incorrecta!');
       }
     } else {
       $this->redirectTo('login');
@@ -61,10 +61,10 @@ class UserController
         $_SESSION['username'] = $userViewModel->username;
         $this->isLoggedIn();
       } else {
-        $this->redirectTo('signup', 'User already exists');
+        $this->redirectTo('signup', 'Usuario ya existe!');
       }
     } else {
-      $this->redirectTo('signup', 'Passwords must be the same');
+      $this->redirectTo('signup', 'Las contraseñas deben ser iguales');
     }
   }
 

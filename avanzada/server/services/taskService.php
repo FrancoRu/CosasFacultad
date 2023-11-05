@@ -1,12 +1,12 @@
 <?php
-
+require_once 'services/../dbRepository/DBService.php';
 class TaskService
 {
   private $dbInstance;
   private $instance;
   private function __construct()
   {
-    $this->dbInstance = DBServices::getInstance();
+    $this->dbInstance = DBService::getInstance();
   }
 
   public static function getInstance()

@@ -1,5 +1,5 @@
  <?php
-  require_once 'DBServices.php';
+  require_once '.\\dbRepository\\DBService.php';
 
   class UserService
   {
@@ -8,7 +8,7 @@
 
     private function __construct()
     {
-      $this->dbInstance = DBServices::getInstance();
+      $this->dbInstance = DBService::getInstance();
     }
 
     public static function getInstance()
