@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" type="text/css" href="./styles/styles.css" />
+    <title>Inicio de Sesion</title>
+  </head>
+
+  <body>
+    <header class="header">
+      <div class="header-image">
+        <img src="/assets/header.jpg" alt="Imágen de cabecera para la FCyT" />
+      </div>
+      <form method="POST" action="/logout">
+        <button type="submit" class="app-button" id="logoutBtn">Salir</button>
+      </form>
+    </header>
+    <div id="container">
+      <p id="error-message" class="error" style="display: none"></p>
+    </div>
+
+    <script src="main.js" defer></script>
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-image">
+          <img src="/assets/footer.jpg" alt="Imágen para el pie de la FCyT" />
+        </div>
+      </div>
+    </footer>
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.js"
+      integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+      crossorigin="anonymous"></script>
+  </body>
+</html>

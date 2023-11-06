@@ -8,7 +8,7 @@ $(function () {
 
   loginForm.on('submit', async function (event) {
     event.preventDefault()
-
+    console.log('entro')
     const username = usernameInput.val()
     const password = passwordInput.val()
 

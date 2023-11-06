@@ -9,7 +9,7 @@
 
 <body>
   <div class="container">
-    <form>
+    <form id="loginForm" action="/" method="post">
       <?php require_once 'views/partial/form.php' ?>
       <input type="submit" value="Ingresar" class="app-button">
     </form>

@@ -1,15 +1,18 @@
 <?php
-require_once 'php/../services/userService.php';
-require_once 'php/../models/userViewModel.php';
+require_once 'server/../services/userService.php';
+require_once 'server/../models/userViewModel.php';
+require_once 'tagService.php';
 
 class UserController
 {
   private static $instance;
   private $userService;
+  private $tag;
 
   private function __construct()
   {
     $this->userService = UserService::getInstance();
+    $this->tag = TagService::getInstance();
   }
 
   public static function getInstance()
@@ -22,75 +25,75 @@ class UserController
 
   public function isLoggedIn()
   {
-    if (isset($_SESSION['username'])) {
-      $this->redirectTo('home');
-    } else {
-      $this->redirectTo('login');
+    if (!isset($_SESSION['username'])) {
+      return $this->tag->getFormLogin();
     }
+    return $this->tag->getHome();
   }
 
   public function logIn()
   {
-
-    $userViewModel = new UserViewModel($_POST);
-
-    if ($userViewModel->isValid()) {
-      $result = $this->userService->logIn($userViewModel);
+    $userData = new UserViewModel($_POST);
+    if ($userData->isValid()) {
+      $result = $this->userService->logIn(get_object_vars($userData));
       if ($result) {
-        $_SESSION['username'] = $userViewModel->username;
+        $_SESSION['username'] = $userData->username;
         $this->isLoggedIn();
       } else {
-        $this->redirectTo('login', 'Usuario or contraseña incorrecta!');
+        error_log('no entro result');
+        $this->errorResponse($userData->getError());
       }
     } else {
-      $this->redirectTo('login');
+      error_log('no entro isValid');
+      $this->errorResponse($userData->getError());
     }
   }
 
   public function signUp()
   {
-    $userViewModel = new UserViewModel($_POST);
-
-    if ($userViewModel->isValid()) {
-      $result = $this->userService->signUp($userViewModel);
-      if ($result) {
-        $_SESSION['username'] = $userViewModel->username;
-        $this->isLoggedIn();
+    if ($_POST['confirm_password'] === $_POST['password']) {
+      $userData = new UserViewModel($_POST);
+      if ($userData->isValid()) {
+        $result = $this->userService->signUp(get_object_vars($userData));
+        if ($result) {
+          $_SESSION['username'] = $userData->username;
+          $this->isLoggedIn();
+        } else {
+          $this->errorResponse($userData->getError());
+        }
       } else {
-        $this->redirectTo('signup', 'Usuario ya existe!');
+        $this->errorResponse($userData->getError());
       }
-    } else {
-      $this->redirectTo('signup', 'Las contraseñas deben ser iguales');
     }
   }
 
   public function changePassword()
   {
     if (!isset($_SESSION['username'])) {
-      $this->redirectTo('login');
+      $this->errorResponse('user no valid');
       return;
     }
 
     $userData = new UserViewModel($_POST);
 
-    if ($userData->isValidUsername() && $userData->isValidPassword()) {
+    if ($userData->isValid()) {
       $result = $this->userService->changePassword(get_object_vars($userData));
-
       if ($result === true) {
-        $this->redirectTo('home');
+        $this->successResponse($userData->getNombre());
       } else {
-        $this->redirectTo('home', 'Password change failed');
+        $this->errorResponse($userData->getError());
       }
     } else {
-      $this->redirectTo('home', 'Password validation error');
+      $this->errorResponse($userData->getError());
     }
   }
 
   public function logOut()
   {
+    require_once 'tagService.php';
     session_unset();
     session_destroy();
-    $this->redirectTo('login');
+    $this->tag->getFormLogin();
   }
 
   public function getUser()
@@ -98,14 +101,20 @@ class UserController
     return $_SESSION['username'] ?? null;
   }
 
-  private function redirectTo($viewName, $error_message = null)
+  private function successResponse($data)
   {
-    if ($error_message) {
-      $_SESSION['error_message'] = $error_message;
-    }
+    http_response_code(200);
+    $this->jsonResponse($data);
+  }
 
-    include_once "views/$viewName.php";
-    unset($_SESSION['error_message']);
-    exit();
+  private function errorResponse($data)
+  {
+    http_response_code(400);
+    $this->jsonResponse($data);
+  }
+
+  private function jsonResponse($data)
+  {
+    return json_encode($data, JSON_UNESCAPED_UNICODE);
   }
 }

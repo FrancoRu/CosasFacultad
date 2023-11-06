@@ -187,3 +187,7 @@ input[type='password'] {
 .comment-form input[type='submit']:hover {
   background-color: #555;
 }
+
+.ocultar {
+  display: none;
+}

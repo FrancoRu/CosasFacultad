@@ -100,4 +100,8 @@ class ProjectService
       return $e->getMessage(); // Maneja la excepción de manera adecuada
     }
   }
+
+  private function constructJSON($arg)
+  {
+  }
 }

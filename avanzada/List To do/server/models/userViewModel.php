@@ -16,7 +16,7 @@ class UserViewModel
     return $this->isValidUsername() && $this->isValidPassword();
   }
 
-  public function isValidUsername()
+  private function isValidUsername()
   {
     if (empty($this->username) || strlen($this->username) > 25 || strlen($this->username) < 5 || !is_string($this->username)) {
       $this->error = $this->createError('Nombre de usuario inválido.');
@@ -26,24 +26,33 @@ class UserViewModel
     return true;
   }
 
-  public function isValidPassword()
+  private function isValidPassword()
   {
+    $errors = array();
+
     if (empty($this->password) || !is_string($this->password)) {
-      $this->error = $this->createError('Contraseña inválida.');
-      return false;
+      $errors[] = $this->createError('Contraseña inválida.');
     }
 
     if (strlen($this->password) < 5 || strlen($this->password) > 25) {
-      $this->error = $this->createError('La contraseña debe tener entre 5 y 25 caracteres.');
-      return false;
+      $errors[] = $this->createError('La contraseña debe tener entre 5 y 25 caracteres.');
     }
 
     if (!preg_match('/^(?=.*[A-Z])(?=.*\d)(?=.*[@#$%^&+=]).+$/', $this->password)) {
-      $this->error = $this->createError('La contraseña debe contener al menos una letra mayúscula, un símbolo y un número.');
+      $errors[] = $this->createError('La contraseña debe contener al menos una letra mayúscula, un símbolo y un número.');
+    }
+
+    if (!empty($errors)) {
+      $this->error = implode(' ', $errors); // Combina los mensajes de error en un solo mensaje
       return false;
     }
 
     return true;
+  }
+
+  public function getNombre()
+  {
+    return $this->username;
   }
 
   public function getError()
