@@ -41,7 +41,7 @@ class ProjectService
         return null;
       }
     } catch (Exception $e) {
-      return $e->getMessage($args); // Maneja la excepción de manera adecuada
+      return $e->getMessage($args);
     }
   }
 
@@ -55,7 +55,7 @@ class ProjectService
         return null;
       }
     } catch (Exception $e) {
-      return $e->getMessage($args); // Maneja la excepción de manera adecuada
+      return $e->getMessage($args);
     }
   }
 
@@ -69,7 +69,7 @@ class ProjectService
         return null;
       }
     } catch (Exception $e) {
-      return $e->getMessage($args); // Maneja la excepción de manera adecuada
+      return $e->getMessage($args);
     }
   }
 
@@ -80,10 +80,10 @@ class ProjectService
       if ($result->num_rows > 0) {
         return $result->fetch_assoc();
       } else {
-        return null;
+        return array();
       }
     } catch (Exception $e) {
-      return $e->getMessage(); // Maneja la excepción de manera adecuada
+      return $e->getMessage();
     }
   }
 
@@ -92,16 +92,16 @@ class ProjectService
     try {
       $result = $this->dbInstance->executeQuery($_ENV['QUERY_PROJECT_GET_ALL_BY_USER'], [...$args]);
       if ($result->num_rows > 0) {
-        return $result->fetch_assoc();
+        $newArray = array();
+        while ($row = $result->fetch_assoc()) {
+          $newArray[] = $row;
+        }
+        return $newArray;
       } else {
-        return null;
+        return array();
       }
     } catch (Exception $e) {
-      return $e->getMessage(); // Maneja la excepción de manera adecuada
+      return $e->getMessage();
     }
-  }
-
-  private function constructJSON($arg)
-  {
   }
 }

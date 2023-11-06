@@ -1,5 +1,8 @@
 <?php
+
+require_once 'server/../services/tagService.php';
 header('Content-Type: application/json');
+
 header('Content-Type: text/html');
 require 'server/../vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);

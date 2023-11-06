@@ -8,7 +8,6 @@ if (array_key_exists($requestUri, $routes)) {
   if (array_key_exists($requestMethod, $routes[$requestUri])) {
     list($controllerName, $methodName) = explode('@', $routes[$requestUri][$requestMethod]);
     $controllerFile = DIR . '/controllers/' . $controllerName . '.php';
-    error_log(strval($controllerName));
     if (file_exists($controllerFile)) {
       require_once $controllerFile;
       $controller = $controllerName::getInstance();

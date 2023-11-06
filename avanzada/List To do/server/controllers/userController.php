@@ -1,7 +1,6 @@
 <?php
 require_once 'server/../services/userService.php';
 require_once 'server/../models/userViewModel.php';
-require_once 'tagService.php';
 
 class UserController
 {
@@ -26,9 +25,9 @@ class UserController
   public function isLoggedIn()
   {
     if (!isset($_SESSION['username'])) {
-      return $this->tag->getFormLogin();
+      return $this->tag::getFormLogin();
     }
-    return $this->tag->getHome();
+    return $this->tag::getHome();
   }
 
   public function logIn()
@@ -40,11 +39,9 @@ class UserController
         $_SESSION['username'] = $userData->username;
         $this->isLoggedIn();
       } else {
-        error_log('no entro result');
         $this->errorResponse($userData->getError());
       }
     } else {
-      error_log('no entro isValid');
       $this->errorResponse($userData->getError());
     }
   }
@@ -90,10 +87,9 @@ class UserController
 
   public function logOut()
   {
-    require_once 'tagService.php';
     session_unset();
     session_destroy();
-    $this->tag->getFormLogin();
+    $this->tag::getFormLogin();
   }
 
   public function getUser()

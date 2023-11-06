@@ -25,7 +25,7 @@ function init() {
   $('#logoutBtn').on('click', function (event) {
     event.preventDefault()
     $.ajax({
-      url: 'index.php/logout',
+      url: 'index.php/tasks/',
       method: 'GET',
       success: function (response) {
         if (response) {
@@ -68,3 +68,23 @@ function init() {
       })
   })
 }
+
+$('#BtnPrueba').on('click', function (event) {
+  event.preventDefault()
+  var projectId = 'Pro1' // Reemplaza 123 con el valor desead
+  $.ajax({
+    url: 'index.php/tasks',
+    method: 'POST',
+    data: { project_id: projectId }
+  })
+    .done(function (response) {
+      $('#contain-table').empty()
+      $('#contain-table').append(response)
+      $('#table').DataTable()
+    })
+    .fail(function (xhr, status, error) {
+      console.log('Error en la solicitud AJAX:')
+      console.log('Código de estado:', xhr.status)
+      console.log('Mensaje de error:', error)
+    })
+})

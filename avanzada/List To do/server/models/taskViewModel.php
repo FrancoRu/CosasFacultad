@@ -45,10 +45,15 @@ class TaskViewModel
 
   public function validateProjectId()
   {
-    if (!is_string($this->project_id) || !preg_match('/^[0-9a-fA-F]{32}$/', $this->project_id)) {
+
+    if (!is_string($this->project_id)) {
       $this->error = $this->createError('Formato de project_id inválido');
       return false;
     }
+    // if (!is_string($this->project_id) || !preg_match('/^[0-9a-fA-F]{32}$/', $this->project_id)) {
+    //   $this->error = $this->createError('Formato de project_id inválido');
+    //   return false;
+    // }
 
     return true;
   }

@@ -1,15 +1,17 @@
 <?php
-require_once 'php/../services/taskService.php';
-require_once 'php/../models/taskViewModel.php';
+require_once 'server/../services/taskService.php';
+require_once 'server/../models/taskViewModel.php';
 
 class TaskController
 {
   private static $instance;
   private $taskService;
+  private $tag;
 
   private function __construct()
   {
     $this->taskService = TaskService::getInstance();
+    $this->tag = TagService::getInstance();
   }
 
   public static function getInstance()
@@ -71,10 +73,11 @@ class TaskController
   public function getAllTasks()
   {
     $taskData = new TaskViewModel(['project_id' => $_POST['project_id']]);
-
     if ($taskData->validateProjectId()) {
       $result = $this->taskService->getAllTasks([$_POST['project_id']]);
-      return $this->successResponse($result);
+      http_response_code(200);
+      echo $this->tag::getTable($result);
+      exit();
     }
 
     return $this->errorResponse("Falta 'project_id' en la request o el dato es invalido");

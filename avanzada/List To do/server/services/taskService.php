@@ -3,7 +3,7 @@ require_once 'services/../dbRepository/DBService.php';
 class TaskService
 {
   private $dbInstance;
-  private $instance;
+  private static $instance;
   private function __construct()
   {
     $this->dbInstance = DBService::getInstance();
@@ -61,7 +61,7 @@ class TaskService
     try {
       $result = $this->dbInstance->executeQuery($_ENV['QUERY_GET_BY_ID_TASK'], [...$args]);
       if ($result->num_rows > 0) {
-        $result->fetch_assoc();
+        return $result->fetch_assoc();
       }
       return false;
     } catch (Exception $e) {
@@ -74,7 +74,7 @@ class TaskService
     try {
       $result = $this->dbInstance->executeQuery($_ENV['QUERY_GET_BY_ID_ALL_TASK'], [...$args]);
       if ($result->num_rows > 0) {
-        $result->fetch_assoc();
+        return $result;
       }
       return false;
     } catch (Exception $e) {

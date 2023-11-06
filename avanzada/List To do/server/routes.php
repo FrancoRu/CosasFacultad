@@ -1,5 +1,4 @@
 <?php
-error_log('entro aca');
 return [
   '/' => ['GET' => 'userController@isLoggedIn'],
   '/home' => ['GET' => 'userController@isLoggedIn'],
@@ -11,9 +10,9 @@ return [
   '/projects/edit/{id}' => ['POST' => 'ProjectController@update'],
   '/projects/delete/{id}' => ['POST' => 'ProjectController@delete'],
   '/projects/{id}' => ['GET' => 'ProjectController@getProject'],
-  '/tasks' => ['GET' => 'TaskController@getAllTasks'],
+  '/tasks' => ['POST' => 'taskController@getAllTasks'],
   '/tasks/create' => ['POST' => 'TaskController@create'],
   '/tasks/edit/{id}' => ['POST' => 'TaskController@update'],
   '/tasks/delete/{id}' => ['POST' => 'TaskController@delete'],
-  '/tasks/{id}' => ['GET' => 'TaskController@getTask'],
+  '/tasks/{id}' => ['GET' => 'taskController@getTask'],
 ];
