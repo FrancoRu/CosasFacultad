@@ -20,9 +20,9 @@ class ProjectController
     return self::$instance;
   }
 
-  public function createProject()
+  public function createProject($args)
   {
-    $projectData = new ProjectViewModel($_POST);
+    $projectData = new ProjectViewModel($args);
 
     if (!$projectData->isValid()) {
       return $this->errorResponse("Datos no válidos");
@@ -32,9 +32,9 @@ class ProjectController
     return $this->successResponse($result);
   }
 
-  public function modifyProject()
+  public function modifyProject($args)
   {
-    $projectData = new ProjectViewModel($_POST);
+    $projectData = new ProjectViewModel($args);
 
     if (!$projectData->isValid()) {
       return $this->errorResponse("Datos no válidos");
@@ -44,36 +44,36 @@ class ProjectController
     return $this->successResponse($result);
   }
 
-  public function deleteProject()
+  public function deleteProject($args)
   {
-    $projectData = new ProjectViewModel(['project_id' => $_POST['project_id']]);
+    $projectData = new ProjectViewModel(['project_id' => $args['project_id']]);
 
-    if ($projectData->validateProjectId($_POST['project_id'])) {
-      $result = $this->projectService->deleteProject([$_POST['project_id']]);
+    if ($projectData->validateProjectId($args['project_id'])) {
+      $result = $this->projectService->deleteProject([$args['project_id']]);
       return $this->successResponse($result);
     }
 
     return $this->errorResponse("Falta 'project_id 'en la request o el dato es inválido");
   }
 
-  public function getProject()
+  public function getProject($args)
   {
-    $projectData = new ProjectViewModel(['project_id' => $_POST['project_id']]);
+    $projectData = new ProjectViewModel(['project_id' => $args['project_id']]);
 
     if ($projectData->validateProjectId()) {
-      $result = $this->projectService->getProject([$_POST['project_id']]);
+      $result = $this->projectService->getProject([$args['project_id']]);
       return $this->successResponse($result);
     }
 
     return $this->errorResponse("Falta 'project_id' en la request o el dato es inválido");
   }
 
-  public function getAllProjects()
+  public function getAllProjects($args)
   {
-    $projectData = new ProjectViewModel(['project_userId' => $_POST['project_userId']]);
+    $projectData = new ProjectViewModel(['project_userId' => $args['project_userId']]);
 
     if ($projectData->validateUserId()) {
-      $result = $this->projectService->getAllProject([$_POST['project_userId']]);
+      $result = $this->projectService->getAllProject([$args['project_userId']]);
       return $this->successResponse($result);
     }
 

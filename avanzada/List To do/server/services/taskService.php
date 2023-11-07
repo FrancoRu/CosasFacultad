@@ -74,7 +74,7 @@ class TaskService
     try {
       $result = $this->dbInstance->executeQuery($_ENV['QUERY_GET_BY_ID_ALL_TASK'], [...$args]);
       if ($result->num_rows > 0) {
-        return $result;
+        return $result->fetch_assoc();
       }
       return false;
     } catch (Exception $e) {

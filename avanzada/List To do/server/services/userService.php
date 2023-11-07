@@ -11,6 +11,11 @@
       $this->dbInstance = DBService::getInstance();
     }
 
+    private function logError($message)
+    {
+      error_log($message);
+    }
+
     public static function getInstance()
     {
       if (self::$instance === null) {
@@ -22,11 +27,16 @@
     public function logIn($args)
     {
       try {
+        $this->logError("entramos al metodo del service");
         $result = $this->dbInstance->executeQuery($_ENV['QUERY_LOGIN'], [$args['username']]);
         if ($result->num_rows > 0) {
+          $this->logError("la bd pudo insertar cosas");
           $row = $result->fetch_assoc();
+          error_log(json_encode($row['password']));
+          error_log(json_encode($args['password']));
           return password_verify($args['password'], $row['password']);
         } else {
+          $this->logError("no hicimos nada en la bd");
           return null;
         }
       } catch (Exception $e) {

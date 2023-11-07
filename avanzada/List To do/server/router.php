@@ -11,7 +11,8 @@ if (array_key_exists($requestUri, $routes)) {
     if (file_exists($controllerFile)) {
       require_once $controllerFile;
       $controller = $controllerName::getInstance();
-      $controller->$methodName();
+      $args = getParams($requestMethod);
+      $controller->$methodName($args);
     } else {
       http_response_code(404);
       echo 'Controllador no encontrado';
@@ -23,4 +24,29 @@ if (array_key_exists($requestUri, $routes)) {
 } else {
   http_response_code(404);
   echo 'Ruta no encontrada' . $requestUri;
+}
+
+
+function redirect($file)
+{
+  header('Location: views/home/home.php');
+  exit();
+}
+
+function getParams($requestMethod)
+{
+  if ($requestMethod === 'GET') {
+    $pieceURL = parse_url($_SERVER['REQUEST_URI']);
+    if (!empty($pieceURL['query'])) {
+      $queryString = $pieceURL['query'];
+      parse_str($queryString, $args);
+      return $args;
+    } else {
+      return [];
+    }
+  } elseif ($requestMethod === 'POST') {
+    return $_POST;
+  } else {
+    return [];
+  }
 }

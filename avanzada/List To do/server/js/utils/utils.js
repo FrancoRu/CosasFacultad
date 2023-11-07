@@ -8,4 +8,8 @@ function isValidPassword(password) {
   return passwordPattern.test(password)
 }
 
-export { isValidUsername, isValidPassword }
+function areWordsEqual(word1, word2) {
+  return word1 === word2
+}
+
+export { isValidUsername, isValidPassword, areWordsEqual }

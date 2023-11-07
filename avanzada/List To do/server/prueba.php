@@ -1,10 +1,8 @@
 <?php
 
-if (preg_match('/^(?=.*[A-Z])(?=.*\d)(?=.*[@#$%^&+=]).+$/', 'Profesaki123@')) {
-  echo 'Valido';
-}
-if (empty('Profesaki') || strlen('Profesaki') > 25 || strlen('Profesaki') < 5 || !is_string('Profesaki')) {
-  echo 'inValido';
+
+if (password_verify("Fran12@", "$2y$10$PtLkwtPdAeWfX11mVmJLle/z14rLzSzqaLXPFWyro5DvSBKTrzg/m")) {
+  echo 'Son iguales';
 } else {
-  echo 'Valido user';
+  echo "no anda";
 }

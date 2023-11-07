@@ -6,7 +6,7 @@ class ProjectService
   private $instance;
   private function __construct()
   {
-    $this->dbInstance = DBServices::getInstance();
+    $this->dbInstance = DBService::getInstance();
   }
 
   public static function getInstance()
@@ -92,11 +92,11 @@ class ProjectService
     try {
       $result = $this->dbInstance->executeQuery($_ENV['QUERY_PROJECT_GET_ALL_BY_USER'], [...$args]);
       if ($result->num_rows > 0) {
-        $newArray = array();
-        while ($row = $result->fetch_assoc()) {
-          $newArray[] = $row;
-        }
-        return $newArray;
+        // $newArray = array();
+        // while ($row = $result->fetch_assoc()) {
+        //   $newArray[] = $row;
+        // }
+        return $result->fetch_assoc();
       } else {
         return array();
       }

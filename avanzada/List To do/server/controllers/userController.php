@@ -6,12 +6,15 @@ class UserController
 {
   private static $instance;
   private $userService;
-  private $tag;
 
   private function __construct()
   {
     $this->userService = UserService::getInstance();
-    $this->tag = TagService::getInstance();
+  }
+
+  private function logError($message)
+  {
+    error_log($message);
   }
 
   public static function getInstance()
@@ -22,66 +25,58 @@ class UserController
     return self::$instance;
   }
 
-  public function isLoggedIn()
+  public function isLoggedIn($args)
   {
     if (!isset($_SESSION['username'])) {
-      return $this->tag::getFormLogin();
+      $this->redirectToView('home');
+      exit();
     }
-    return $this->tag::getHome();
+    $this->redirectToView('login');
+    exit();
   }
 
-  public function logIn()
+  public function logIn($args)
   {
-    $userData = new UserViewModel($_POST);
+    $userData = new UserViewModel($args);
     if ($userData->isValid()) {
       $result = $this->userService->logIn(get_object_vars($userData));
       if ($result) {
         $_SESSION['username'] = $userData->username;
-        $this->isLoggedIn();
+        header("Location: /views/home/home.php");
+        exit();
       } else {
         $this->errorResponse($userData->getError());
+        exit();
       }
     } else {
       $this->errorResponse($userData->getError());
+      exit();
     }
   }
 
-  public function signUp()
+  public function signUp($args)
   {
-    if ($_POST['confirm_password'] === $_POST['password']) {
-      $userData = new UserViewModel($_POST);
+    $this->logError("entramos al metodo");
+    if ($args['confirm_password'] === $args['password']) {
+      $this->logError("entramos a la igualdad");
+      $userData = new UserViewModel($args);
       if ($userData->isValid()) {
+        $this->logError("entramos validado");
         $result = $this->userService->signUp(get_object_vars($userData));
         if ($result) {
+          $this->logError("entramos al resultado");
           $_SESSION['username'] = $userData->username;
-          $this->isLoggedIn();
+          $this->isLoggedIn($args);
         } else {
           $this->errorResponse($userData->getError());
+          $this->logError("fallo: " . $userData->getError());
         }
       } else {
         $this->errorResponse($userData->getError());
-      }
-    }
-  }
-
-  public function changePassword()
-  {
-    if (!isset($_SESSION['username'])) {
-      $this->errorResponse('user no valid');
-      return;
-    }
-
-    $userData = new UserViewModel($_POST);
-
-    if ($userData->isValid()) {
-      $result = $this->userService->changePassword(get_object_vars($userData));
-      if ($result === true) {
-        $this->successResponse($userData->getNombre());
-      } else {
-        $this->errorResponse($userData->getError());
+        $this->logError("fallo la data del user " . $userData->getError());
       }
     } else {
-      $this->errorResponse($userData->getError());
+      $this->logError("no eran iguales las pass");
     }
   }
 
@@ -89,7 +84,6 @@ class UserController
   {
     session_unset();
     session_destroy();
-    $this->tag::getFormLogin();
   }
 
   public function getUser()
@@ -112,5 +106,19 @@ class UserController
   private function jsonResponse($data)
   {
     return json_encode($data, JSON_UNESCAPED_UNICODE);
+  }
+  private function redirectToView($viewName)
+  {
+    $viewPath = "server/../views/$viewName/$viewName.php";
+
+    if (file_exists($viewPath)) {
+      // La vista existe, así que redirigimos al usuario a la URL de la vista
+      header("Location: /$viewPath");
+      exit; // Asegúrate de detener la ejecución del script después de la redirección
+    } else {
+      // La vista no se encuentra, puedes redirigir al usuario a una página de error o a otra URL
+      header("Location: /");
+      exit;
+    }
   }
 }
