@@ -114,6 +114,3 @@ def Ejercicio3():
     plt.ylabel('Tiempo acumulado (s)')
     plt.title('Tiempo acumulado en cada iteración')
     plt.show()
-
-def Ejercicio4():
-    
