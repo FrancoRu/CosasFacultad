@@ -53,7 +53,35 @@ def Ejercicio1():
             tiempo_ejecucion = end_time - start_time
             print(f"dx = {dx}, dy = {dy}, Tiempo de ejecución = {tiempo_ejecucion:.4f} segundos")
 
-# Ejercicio1()
+def Ejercicio2(): 
+    var_x = [1,2,3,4,5]
+    var_y = [2,3,5,4,6]
+
+    def prod(datos_x, datos_y):
+        productos = []
+        for i in range(len(datos_x)):
+            productos.append(datos_x[i] * datos_y[i])
+        return productos
+
+    def cua(datos):
+        productos = []
+        for elemento in datos:
+            productos.append(elemento**2)
+        return productos
+    
+    def m(datos_x, datos_y):
+       pro = prod(datos_x, datos_y)
+       cuad = cua(datos_x)
+       pen = (sum(pro) - (sum(datos_x) * sum(datos_y)/len(datos_x))) / (sum(cuad) - (sum(datos_x)**2 / len(datos_x)))
+       return pen
+
+    def b(datos_x, datos_y, pen):
+        return (sum(datos_y) / len(datos_y)) - (pen * (sum(datos_x) / len(datos_x)))
+
+    pendiente = m(var_x, var_y)
+    termino = b(var_x, var_y, pendiente)
+    print(f"La ecuacion de la recta es y={pendiente:.2f}x+{termino:.2f}")
+
 
 def Ejercicio3():
 
@@ -73,7 +101,7 @@ def Ejercicio3():
     tiempo_acumulado = []
     tiempo_total = 0
 
-    for i, elemento in enumerate(array):
+    for  i, elemento in enumerate(array):
         inicio = time.time()
         calcular_anillo(elemento, k)
         fin = time.time()
@@ -86,4 +114,6 @@ def Ejercicio3():
     plt.ylabel('Tiempo acumulado (s)')
     plt.title('Tiempo acumulado en cada iteración')
     plt.show()
+
+def Ejercicio4():
     
