@@ -1,8 +1,12 @@
 import sympy as sp
 import numpy as np
+import pandas as pd
 import random
 import time
 import matplotlib.pyplot as plt
+import math
+# from google.colab import auth, drive 
+# drive.mount('/content/drive') 
 
 def Ejercicio1():
     # Definir las variables
@@ -115,4 +119,58 @@ def Ejercicio3():
     plt.title('Tiempo acumulado en cada iteración')
     plt.show()
 
-Ejercicio1()
+def Ejercicio4():
+    
+    def convertirDF(dataFrame):
+
+        # Encontrar la columna numérica y aplicar la función logarítmica
+        for col in dataFrame.columns:
+            #Se valida el tipo en la columna
+            if dataFrame[col].dtype == "int64":
+                #Si es un int64 entonces se aplica la transformacion logaritmica
+                dataFrame[col] = dataFrame[col].apply(lambda x: math.log(x))
+
+        if len(dataFrame.columns) > 10:
+            dataFrame = dataFrame.iloc[:, :10]
+            
+        # Convertir los nombres de las columnas a minúsculas
+        dataFrame.columns = map(str.lower, dataFrame.columns)
+
+        # Transformar la columna ordinal a escala numérica
+        # Dividir la cadena por comas y asignar valores numéricos a cada categoría
+        categorias = {'Malo': 0, 'Neutro': 1, 'Bueno': 2, 'Muy bueno': 3}
+        dataFrame['columna_ordinal'] = dataFrame['columna_ordinal'].apply(lambda x: categorias.get(x.split(',')[0].strip(), None))
+
+        print(dataFrame)
+
+
+        # Exportar a Google Drive
+        # writer = pd.ExcelWriter('/content/drive/MyDrive/ejercicio4_ia.xlsx')
+        # dataFrame.to_excel(writer, index=False)
+        # writer.save()
+        # auth.authenticate_user() # para poder guardar el excel en drive
+
+    data = pd.DataFrame({
+        'coluMna_numerico': [1,2,3,4],
+        'columna_Ordinal': ['Malo', 'Neutro', 'Bueno', 'Muy bueno'],
+        'columna_texto1': ['a', 'b', 'c', 'd'],
+        'columna_texto2': ['a', 'b', 'c', 'd'],
+        'columna_booleana': [True, False, True, False],
+        'columna_booleana2': [True, False, True, False],
+        'columna_BOOLEANA': [True, False, True, False],
+        'columna_booleana3': [True, False, True, False],
+        'COLUMNA_booleana': [True, False, True, False],
+        'columna_booleana4': [True, False, True, False],
+    })
+    convertirDF(data)
+
+#RESPUESTAS
+
+# 1
+# a) Conforme pasan las iteraciones, el punto (x,y) se desplaza en la dirección del gradiente negativo de la función f(x,y). En otras palabras, 
+# el punto se mueve hacia donde la función disminuye más rápidamente. Si la función tiene un mínimo local, el punto convergerá hacia ese mínimo.
+# b) Acá pueden surgir 2 posibilidades:
+#     * dx y dy pequeños: La función tendrá más precisión pero requerirá más iteraciones para llegar al punto de convergencia
+#     * dx y dy grandes: La función sacrifica precisión pero tendrá que realizar menos iteraciones, pero cabe la posibilidad de que si el desplazamiento es muy grande la misma sólo diverge y no converja en un punto en particular.
+# c) Si la función no es diferenciable en el rango en cuestión, esto puede causar problemas con el método del gradiente descendente. En primer lugar, el gradiente podría no estar definido en ciertos puntos, lo que dificultará la determinación de la dirección del movimiento. Además, incluso si el gradiente está definido, podría ser poco confiable cerca de los puntos de no diferenciabilidad, lo que podría llevar a comportamientos inesperados, como oscilaciones o divergencia en el algoritmo.
+# Cuando los diferenciales son extremadamente pequeños, el costo computacional tiende a aumentar. Esto se debe a que se necesitan más iteraciones para alcanzar la convergencia, ya que cada paso es más pequeño y se necesita más tiempo para alcanzar el mínimo global. Además, la precisión numérica también puede influir en el costo computacional, ya que calcular los gradientes con diferenciales muy pequeños puede introducir errores numéricos adicionales.
