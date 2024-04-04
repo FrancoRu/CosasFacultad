@@ -270,9 +270,46 @@ def Ejercicio3():
     numeric(columnas_numericas)
     categoric(columnas_categoricas)
 
-Ejercicio3()
+def Ejercicio4():
+    data = pd.read_csv('laptop_pricing_dataset.csv', index_col=None)
+    
+    
+    data = data.drop(columns=['Category'])
+    # Obtener una lista de columnas con valores nulos
+    columnas_con_nulos = data.columns[data.isnull().any()].tolist()
 
+    # Iterar sobre las columnas con valores nulos
+    for columna in columnas_con_nulos:
+        # Imputar el valor más frecuente en la columna actual
+        valor_mas_frecuente = data[columna].mode()[0]
+        data[columna].fillna(valor_mas_frecuente, inplace=True)
+    
+    print(data.isnull().sum())
+    
+     # Seleccionamos solo las columnas numéricas
+    numeric_data = data.select_dtypes(include=['float64', 'int64'])
+    
+    # Calculamos la correlación de Pearson
+    correlation_matrix = numeric_data.corr(method='spearman')
+    
+    # Creamos la visualización gráfica
+    plt.figure(figsize=(10, 8))
+    plt.imshow(correlation_matrix, cmap='viridis', interpolation='nearest')
+    plt.colorbar(label='Correlation')
+    plt.title('Correlation Spearman')
+    
+    # Agregamos los valores de correlación como texto en cada celda
+    for i in range(len(correlation_matrix)):
+        for j in range(len(correlation_matrix)):
+            plt.text(j, i, "{:.2f}%".format(correlation_matrix.iloc[i, j]*100),
+                     ha='center', va='center', color='white', fontsize=8)
+    
+    plt.xticks(range(len(correlation_matrix)), correlation_matrix.columns, rotation=90)
+    plt.yticks(range(len(correlation_matrix)), correlation_matrix.columns)
+    plt.tight_layout()
+    plt.show()
 
+Ejercicio4()
 #RESPUESTAS
 
 #1
