@@ -84,11 +84,31 @@ def Ejercicio2():
 
     pendiente = m(var_x, var_y)
     termino = b(var_x, var_y, pendiente)
+    
+    # Valores de x
+    x = np.linspace(0, 10, 100)
+
+    # Calculamos los valores correspondientes de 'y' usando la ecuación de la recta
+    y = pendiente * x + termino
+
+    # Graficamos la recta
+    plt.figure(figsize=(8, 6))
+    plt.plot(x, y, color='blue', label=f'y = {pendiente:.2f}x + {termino:.2f}')
+    plt.scatter(var_x, var_y, color='red', label='Puntos')
+
+    # Añadimos etiquetas y título
+    plt.xlabel('X')
+    plt.ylabel('Y')
+    plt.title(f"Gráfico de la recta y={pendiente:.2f}x+{termino:.2f}")
+    plt.legend()
+
+    # Mostramos la gráfica
+    plt.grid(True)
+    plt.show()
     print(f"La ecuacion de la recta es y={pendiente:.2f}x+{termino:.2f}")
 
 
 def Ejercicio3():
-
     def calcular_anillo(n, k):
         return n % k
 
@@ -117,6 +137,8 @@ def Ejercicio3():
     plt.xlabel('n de interacción')
     plt.ylabel('Tiempo acumulado (s)')
     plt.title('Tiempo acumulado en cada iteración')
+    
+    plt.ticklabel_format(style='plain', axis='y')
     plt.show()
 
 def Ejercicio4():
@@ -163,7 +185,7 @@ def Ejercicio4():
         'columna_booleana4': [True, False, True, False],
     })
     convertirDF(data)
-
+Ejercicio3()
 #RESPUESTAS
 
 # 1

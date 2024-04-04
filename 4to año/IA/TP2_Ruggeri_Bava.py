@@ -4,7 +4,7 @@ import pandas as pd
 import tkinter as tk
 from tkinter import ttk
 
-def Ejecricio1():
+def Ejercicio1():
     # Media
     def media(datos):
         return sum(datos) / len(datos)
@@ -309,7 +309,7 @@ def Ejercicio4():
     plt.tight_layout()
     plt.show()
 
-Ejercicio4()
+Ejercicio2()
 #RESPUESTAS
 
 #1
