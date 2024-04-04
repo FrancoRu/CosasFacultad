@@ -130,7 +130,7 @@ def Ejercicio2():
     
     #Variables ordinales
     age = datos['Age']
-    feedback = datos['Feedback']
+    education = datos['Educational Qualifications']
 
     def ranking(dataFrame, columns, order):
         df_copy = dataFrame.copy()
@@ -143,10 +143,25 @@ def Ejercicio2():
 
         frecuencia = frecuencia.reset_index(drop=True)
 
-        print(frecuencia)
+        return frecuencia
 
-    
+    def showPercentage(data):
+        for element in data:
+            print(f"              - {element}: {data[element].sum():.4f}%")
 
+    def showRanking(data):
+        data['Ranking'] = range(1, len(data) + 1)  
+        
+        column_names = list(data.columns)
+
+        # Reordenar las columnas para que 'Ranking' se a la primera columna
+        column_names.insert(0, column_names.pop(column_names.index('Ranking')))
+        data = data[column_names]
+        # Imprimir el DataFrame con un formato personalizado
+        print(data.to_string(index=False, formatters={'Ranking': lambda x: f"{'':>15}{x}"}))
+
+
+            
     def percentage(dataFrame):
 
         df_copy = dataFrame.copy()
@@ -160,8 +175,8 @@ def Ejercicio2():
 
         return df_copy
 
-    # Configurar el tamaño de la figura
-    plt.figure(figsize=(10, 6))
+    # # Configurar el tamaño de la figura
+    # plt.figure(figsize=(10, 6))
 
     # Calcular el porcentaje de ocupaciones
     occupation_percentage = percentage(occupation)
@@ -171,40 +186,32 @@ def Ejercicio2():
 
     # Obtener el ranking de edades
     age_ranking = ranking(age, ['Age', 'Quantity'], 'Quantity')
+    # Obtener el ranking de education
+    education_ranking = ranking(education, ['Educational Qualifications', 'Quantity'], 'Quantity')
+    
+    print("-------------------------------------------------------------------------")
+    print("**************************************************************************")
+    print("*                            Variables nominales:                        *")
+    print("**************************************************************************")
+    print("+    Ocupacion: ")
+    showPercentage(occupation_percentage)
+    print("-------------------------------------------------------------------------")
+    print("+    Genero: ")
+    showPercentage(gender_percentage)
+    print("-------------------------------------------------------------------------")
+    
+    print("**************************************************************************")
+    print("*                            Variables ordinales:                        *")
+    print("**************************************************************************")
+    print("+    Edad: ")
+    showRanking(age_ranking)
+    print("-------------------------------------------------------------------------")
+    print("+    Educational Qualifications: ")
+    showRanking(education_ranking)
+    print("-------------------------------------------------------------------------")
+    
 
-    # Obtener el ranking de feedback
-    feedback_ranking = ranking(feedback, ['Feedback', 'Quantity'], 'Quantity')
-
-     # Trazar el porcentaje de ocupaciones
-    plt.subplot(2, 1, 1)
-    plt.bar(occupation_percentage.columns, occupation_percentage.sum())
-    plt.title('Porcentaje de Ocupaciones')
-    plt.xlabel('Ocupación')
-    plt.ylabel('Porcentaje')
-     # Trazar el porcentaje de ocupaciones
-    plt.subplot(2, 1, 2)
-    plt.bar(gender_percentage.columns, gender_percentage.sum())
-    plt.title('Porcentaje de generos')
-    plt.xlabel('Ocupación')
-    plt.ylabel('Porcentaje')
-
-    # plt.subplot(2, 2, 3)
-    # plt.bar(age_ranking.columns, age_ranking.sum())
-    # plt.xlabel('Age')
-    # plt.ylabel('Puesto')
-    # plt.title('Age')
-    # plt.gca().invert_yaxis()  # Invertir el eje y para que el elemento de mayor cantidad esté arriba
-
-    # Mostrar la figura
-    plt.tight_layout()
-
-    # Mostrar los gráficos
-    plt.show()
-
-    # print(percentage(occupation).sum())
-    # ranking(age, ['Age', 'Quantity'], 'Quantity')
-    # ranking(feedback, ['feedback', 'Quantity'], 'Quantity')
-
+# def Ejercicio3():
+    
 Ejercicio2()
-
 
