@@ -32,41 +32,35 @@ class AG:
         self.poblacion: np.ndarray = np.random.randint(2, size=(self.n, self.dimension))
 
         # Almacenar mejor solución
-        self.best_score = 0
-        self.best_individuo = None
+        self.mejor_score = 0
+        self.mejor_individuo = None
 
-        print(f"Población inicial:\n{self.poblacion}")
 
     def fitness(self, individuo):
-        """Evalúa el individuo (conjunto de features)."""
         indices = np.where(individuo == 1)[0]
         if len(indices) == 0:
             return 0
-        model = RandomForestClassifier()
-        model.fit(self.X_train[:, indices], self.y_train)
-        preds = model.predict(self.X_test[:, indices])
+        modelo = RandomForestClassifier()
+        modelo.fit(self.X_train[:, indices], self.y_train)
+        preds = modelo.predict(self.X_test[:, indices])
         return accuracy_score(self.y_test, preds)
 
     def torneo(self, scores, k=3):
-        """Selecciona un individuo por torneo."""
         idxs = random.sample(range(self.n), k)
         mejor_idx = idxs[np.argmax([scores[i] for i in idxs])]
         return self.poblacion[mejor_idx]
 
     def crossover(self, p1, p2):
-        """Cruza dos padres en un punto aleatorio."""
         punto = random.randint(1, self.dimension - 1)
         return np.concatenate([p1[:punto], p2[punto:]])
 
     def mutar(self, individuo, tasa=0.1):
-        """Muta bits aleatoriamente."""
         for i in range(len(individuo)):
             if random.random() < tasa:
                 individuo[i] = 1 - individuo[i]
         return individuo
 
     def run(self):
-        """Ejecuta el algoritmo genético."""
         for gen in range(self.generacion):
             scores = [self.fitness(ind) for ind in self.poblacion]
             nueva_poblacion = []
@@ -84,14 +78,14 @@ class AG:
 
             # Actualizar mejor individuo
             mejor_idx = np.argmax(scores)
-            if scores[mejor_idx] > self.best_score:
-                self.best_score = scores[mejor_idx]
-                self.best_individuo = self.poblacion[mejor_idx]
+            if scores[mejor_idx] > self.mejor_score:
+                self.mejor_score = scores[mejor_idx]
+                self.mejor_individuo = self.poblacion[mejor_idx]
 
         print("\n✅ Mejores características seleccionadas:")
-        for i in np.where(self.best_individuo == 1)[0]:
+        for i in np.where(self.mejor_individuo == 1)[0]:
             print(f"- {self.variables[i]}")
-        print(f"\n🎯 Accuracy final: {self.best_score:.4f}")
+        print(f"\n🎯 Accuracy final: {self.mejor_score:.4f}")
 
 # Ejecutar con el dataset Wine
 wine = fetch_ucirepo(id=109)
